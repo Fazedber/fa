@@ -78,7 +78,14 @@ prepare_mobile_env() {
         exit 1
     fi
 
-    gomobile init
+    export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
+    export NDK_HOME="${ANDROID_NDK_HOME}"
+
+    # gomobile bind can bootstrap its own toolchain, so treat init as a cache warmup,
+    # not as a hard requirement that blocks the whole Android pipeline.
+    if ! gomobile init; then
+        echo "::warning::gomobile init failed; continuing with direct gomobile bind"
+    fi
 }
 
 build_aar() {

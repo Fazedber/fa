@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading;
-using Windows.UI;
+using Microsoft.UI;
 
 namespace NexusVPN
 {

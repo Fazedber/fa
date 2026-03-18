@@ -248,6 +248,8 @@ jobs:
             "ndk;26.3.11579264"
 
           echo "ANDROID_NDK_HOME=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
+          echo "NDK_HOME=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
 
       - name: Install gomobile
         shell: bash

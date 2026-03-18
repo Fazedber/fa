@@ -86,7 +86,15 @@ prepare_xcode_project() {
     echo -e "${YELLOW}[2/3] Preparing Xcode project...${NC}"
     rm -rf "$PROJECT_DIR/NexusVPN/Api.xcframework" 2>/dev/null || true
     cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
-    xcodegen generate --spec "$PROJECT_SPEC" --project "$PROJECT_DIR"
+    (
+        cd "$PROJECT_DIR"
+        xcodegen generate --spec "$PROJECT_SPEC"
+    )
+
+    if [ ! -d "$PROJECT_DIR/NexusVPN.xcodeproj" ]; then
+        echo -e "${RED}Failed to generate Xcode project at $PROJECT_DIR/NexusVPN.xcodeproj${NC}"
+        exit 1
+    fi
 }
 
 build_app() {
