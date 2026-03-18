@@ -21,6 +21,7 @@
 /dist/macos/
 /dist/windows/Nebula/
 /dist/windows/PepeWatafa/
+/dist/windows/*.zip
 /apps/windows/NexusVPN/bin/
 /apps/windows/NexusVPN/obj/Release/
 
