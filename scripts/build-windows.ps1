@@ -50,7 +50,14 @@ Push-Location (Join-Path $PSScriptRoot "..\core")
 try {
     $env:CGO_ENABLED = "0"
     go mod download
-    go build -ldflags="-s -w -trimpath" -o "$BuildDir\nexus-core.exe" .\cmd\desktop
+    if ($LASTEXITCODE -ne 0) {
+        throw "go mod download failed"
+    }
+
+    go build -trimpath -ldflags="-s -w" -o "$BuildDir\nexus-core.exe" .\cmd\desktop
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path "$BuildDir\nexus-core.exe")) {
+        throw "go build failed for core desktop binary"
+    }
     Write-Host "  Core built: $BuildDir\nexus-core.exe" -ForegroundColor Green
 } finally {
     Pop-Location
@@ -65,7 +72,14 @@ try {
     } else {
         dotnet restore
     }
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet restore failed"
+    }
+
     dotnet publish -c $Configuration -p:AppBrand=$Brand --self-contained false -o "$BuildDir\UI"
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet publish failed"
+    }
     Write-Host "  UI built: $BuildDir\UI\$Brand.exe" -ForegroundColor Green
 } finally {
     Pop-Location
