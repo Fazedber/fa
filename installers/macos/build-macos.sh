@@ -53,7 +53,7 @@ cd ../core
 gomobile bind -target=macos/arm64,macos/amd64 \
     -o "$BUILD_DIR/Core.xcframework" \
     -ldflags="-s -w" \
-    ./api
+    ./mobileapi
 
 echo -e "${GREEN}  Core XCFramework built${NC}"
 

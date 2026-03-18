@@ -56,7 +56,7 @@ export ANDROID_SDK=$(echo ${ANDROID_SDK_ROOT:-$ANDROID_HOME})
 gomobile bind -target=android/arm64,android/arm \
     -o "$BUILD_DIR/core.aar" \
     -ldflags="-s -w" \
-    ./api
+    ./mobileapi
 
 echo -e "${GREEN}  Core AAR built: $BUILD_DIR/core.aar${NC}"
 

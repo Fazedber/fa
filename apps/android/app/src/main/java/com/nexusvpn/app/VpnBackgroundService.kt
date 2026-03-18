@@ -27,9 +27,13 @@ class VpnBackgroundService : VpnService() {
                 return
             }
 
+            val routeParts = config.route.split("/", limit = 2)
+            val routeAddress = routeParts.firstOrNull().orEmpty()
+            val routePrefix = routeParts.getOrNull(1)?.toIntOrNull() ?: 0
+
             val builder = Builder()
                 .addAddress(config.address, 30) // Assuming isolated /30 subnet allocation
-                .addRoute(config.route.split("/")[0], 0) // Parse 0.0.0.0 safely
+                .addRoute(routeAddress, routePrefix)
                 .addDnsServer(config.dns)
                 .setMtu(config.mtu.toInt())
                 .setSession("NexusVPN")

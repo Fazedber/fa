@@ -29,6 +29,9 @@ targets:
       - sdk: SwiftUI.framework
       - sdk: AppKit.framework
       - sdk: NetworkExtension.framework
+      - framework: NexusVPN/Api.xcframework
+        embed: true
+        codeSign: false
       - target: NexusVPNExtension
         embed: true
         codeSign: false
@@ -64,7 +67,6 @@ targets:
       - sdk: Foundation.framework
       - sdk: NetworkExtension.framework
       - framework: NexusVPN/Api.xcframework
-        embed: true
         codeSign: false
     settings:
       base:

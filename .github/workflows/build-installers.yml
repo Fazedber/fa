@@ -116,19 +116,7 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache-dependency-path: core/go.sum
 
-      - name: Check macOS project readiness
-        id: preflight
-        shell: bash
-        run: |
-          if [ -f "apps/macos/project.yml" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=macOS skipped::apps/macos/project.yml is missing. macOS installer packaging is disabled until the project spec exists."
-          fi
-
       - name: Install dependencies
-        if: steps.preflight.outputs.ready == 'true'
         shell: bash
         run: |
           brew install create-dmg xcodegen
@@ -136,7 +124,6 @@ jobs:
           gomobile init
 
       - name: Build Nebula DMG
-        if: steps.preflight.outputs.ready == 'true'
         shell: bash
         env:
           BRAND: Nebula
@@ -148,7 +135,6 @@ jobs:
         run: bash ./scripts/build-installer-macos.sh
 
       - name: Build PepeWatafa DMG
-        if: steps.preflight.outputs.ready == 'true'
         shell: bash
         env:
           BRAND: PepeWatafa
@@ -160,7 +146,6 @@ jobs:
         run: bash ./scripts/build-installer-macos.sh
 
       - name: Upload macOS installers
-        if: steps.preflight.outputs.ready == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: macos-installers
@@ -197,8 +182,38 @@ jobs:
         with:
           gradle-version: "8.7"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Provision Android SDK and NDK
+        shell: bash
+        run: |
+          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-/usr/local/lib/android/sdk}}"
+          if [ ! -d "$sdk_root" ]; then
+            echo "Android SDK not found at $sdk_root" >&2
+            exit 1
+          fi
+
+          if [ -x "$sdk_root/cmdline-tools/latest/bin/sdkmanager" ]; then
+            sdkmanager_bin="$sdk_root/cmdline-tools/latest/bin/sdkmanager"
+            echo "$sdk_root/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          elif [ -x "$sdk_root/cmdline-tools/bin/sdkmanager" ]; then
+            sdkmanager_bin="$sdk_root/cmdline-tools/bin/sdkmanager"
+            echo "$sdk_root/cmdline-tools/bin" >> "$GITHUB_PATH"
+          else
+            echo "sdkmanager was not found under $sdk_root" >&2
+            exit 1
+          fi
+
+          echo "ANDROID_SDK_ROOT=$sdk_root" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$sdk_root" >> "$GITHUB_ENV"
+          echo "$sdk_root/platform-tools" >> "$GITHUB_PATH"
+
+          yes | "$sdkmanager_bin" --licenses >/dev/null || true
+          "$sdkmanager_bin" \
+            "platform-tools" \
+            "platforms;android-34" \
+            "build-tools;34.0.0" \
+            "ndk;26.3.11579264"
+
+          echo "ANDROID_NDK_HOME=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
 
       - name: Install gomobile
         shell: bash
@@ -229,7 +244,7 @@ jobs:
       always() &&
       needs.build-windows-installer.result == 'success' &&
       needs.build-android-apk.result == 'success' &&
-      (needs.build-macos-installer.result == 'success' || needs.build-macos-installer.result == 'skipped')
+      needs.build-macos-installer.result == 'success'
     steps:
       - uses: actions/checkout@v6
 

@@ -1,3 +1,4 @@
+import Foundation
 import NetworkExtension
 import Api // Gomobile generated XCFramework
 
@@ -31,13 +32,23 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             completionHandler(initErr)
             return
         }
-        let tunConfig = coreBridge?.getTunConfig()
+        guard
+            let tunConfigJSON = coreBridge?.getTunConfigJSON(),
+            let tunConfigData = tunConfigJSON.data(using: .utf8),
+            let tunConfig = try? JSONSerialization.jsonObject(with: tunConfigData) as? [String: Any]
+        else {
+            completionHandler(NSError(domain: "NexusVPN", code: 3, userInfo: [NSLocalizedDescriptionKey: "Failed to decode TUN config payload"]))
+            return
+        }
+
+        let tunnelAddress = (tunConfig["address"] as? String) ?? "172.19.0.1"
+        let mtu = (tunConfig["mtu"] as? NSNumber)?.intValue ?? 1500
         
         // 3. Setup NEPacketTunnelNetworkSettings dynamically from Go payload
-        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: tunConfig?.address ?? "172.19.0.1")
+        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: tunnelAddress)
         networkSettings.ipv4Settings = NEIPv4Settings(addresses: ["172.19.0.2"], subnetMasks: ["255.255.255.252"])
         networkSettings.ipv4Settings?.includedRoutes = [NEIPv4Route.default()]
-        networkSettings.mtu = NSNumber(value: tunConfig?.mtu ?? 1500)
+        networkSettings.mtu = NSNumber(value: mtu)
         
         self.setTunnelNetworkSettings(networkSettings) { error in
             if let error = error {

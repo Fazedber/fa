@@ -28,6 +28,10 @@ if (-not $ISCC) {
 
 Write-Host "Found Inno Setup: $ISCC" -ForegroundColor Green
 
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$WindowsDistDir = Join-Path $RepoRoot "dist\windows"
+New-Item -ItemType Directory -Path $WindowsDistDir -Force | Out-Null
+
 # Step 1: Build application
 Write-Host "`n[1/3] Building application..." -ForegroundColor Yellow
 & $PSScriptRoot\build-windows.ps1 -Brand $Brand
@@ -66,7 +70,7 @@ $exeName = if ($Brand -eq "PepeWatafa") { "PepeWatafa.exe" } else { "Nebula.exe"
     "/DVersion=$Version" `
     "/DExeName=$exeName" `
     /Q `
-    /O"..\dist\windows" `
+    "/O$WindowsDistDir" `
     /F"$Brand-VPN-$Version-Setup" `
     $IssFile
 
@@ -75,7 +79,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-$InstallerPath = Resolve-Path "..\dist\windows\$Brand-VPN-$Version-Setup.exe"
+$InstallerPath = Resolve-Path (Join-Path $WindowsDistDir "$Brand-VPN-$Version-Setup.exe")
 
 Write-Host "`n========================================" -ForegroundColor Green
 Write-Host "SUCCESS! Installer created:" -ForegroundColor Green

@@ -67,10 +67,20 @@ go mod download
 export CGO_ENABLED=1
 export ANDROID_SDK="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
 
+if [ -z "${ANDROID_NDK_HOME:-}" ] && [ -d "$ANDROID_SDK/ndk" ]; then
+    ANDROID_NDK_HOME="$(find "$ANDROID_SDK/ndk" -mindepth 1 -maxdepth 1 -type d | sort | tail -n 1)"
+    export ANDROID_NDK_HOME
+fi
+
+if [ -z "${ANDROID_NDK_HOME:-}" ] || [ ! -d "${ANDROID_NDK_HOME}" ]; then
+    echo -e "${RED}ANDROID_NDK_HOME is not set to a valid NDK directory${NC}"
+    exit 1
+fi
+
 gomobile bind -javapkg=api -target=android/arm64,android/arm \
     -o "$BUILD_DIR/core.aar" \
     -ldflags="-s -w" \
-    ./api
+    ./mobileapi
 
 echo -e "${GREEN}  Core AAR built: $BUILD_DIR/core.aar${NC}"
 
@@ -83,7 +93,7 @@ cd "$ANDROID_PROJECT_DIR"
 echo -e "${YELLOW}[3/3] Building Android APK...${NC}"
 
 if [ "$BUILD_TYPE" = "release" ]; then
-    "$GRADLE_BIN" assemble${BRAND^}Release
+    "$GRADLE_BIN" --no-daemon --stacktrace assemble${BRAND^}Release
     APK_PATH="app/build/outputs/apk/${BRAND}/release/app-${BRAND}-release-unsigned.apk"
 
     if [ -f "$APK_PATH" ]; then
@@ -91,7 +101,7 @@ if [ "$BUILD_TYPE" = "release" ]; then
         echo -e "${YELLOW}  Note: APK is unsigned. Sign it before distribution.${NC}"
     fi
 else
-    "$GRADLE_BIN" assemble${BRAND^}Debug
+    "$GRADLE_BIN" --no-daemon --stacktrace assemble${BRAND^}Debug
     APK_PATH="app/build/outputs/apk/${BRAND}/debug/app-${BRAND}-debug.apk"
 
     if [ -f "$APK_PATH" ]; then
