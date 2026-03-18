@@ -76,7 +76,14 @@ try {
         throw "dotnet restore failed"
     }
 
-    dotnet publish -c $Configuration -p:AppBrand=$Brand --self-contained false -o "$BuildDir\UI"
+    dotnet publish `
+        -c $Configuration `
+        -r win-x64 `
+        -p:AppBrand=$Brand `
+        -p:WindowsPackageType=None `
+        -p:WindowsAppSDKSelfContained=true `
+        --self-contained true `
+        -o "$BuildDir\UI"
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet publish failed"
     }
