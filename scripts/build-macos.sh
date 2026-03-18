@@ -50,7 +50,6 @@ check_prereqs() {
     if ! command -v gomobile >/dev/null 2>&1; then
         echo -e "${YELLOW}Installing gomobile...${NC}"
         go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
-        gomobile init
     fi
 
     if ! command -v xcodegen >/dev/null 2>&1; then
