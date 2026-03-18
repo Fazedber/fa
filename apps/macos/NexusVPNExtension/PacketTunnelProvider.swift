@@ -1,0 +1,57 @@
+import NetworkExtension
+import Api // Gomobile generated XCFramework
+
+// This process runs totally isolated from the UI UI sandbox.
+// It loads the Go Core dynamic library (`.dylib`).
+class PacketTunnelProvider: NEPacketTunnelProvider {
+
+    var coreBridge: ApiMobileBridge?
+
+    override func startTunnel(options: [String : NSObject]?, completionHandler: @escaping (Error?) -> Void) {
+        // Stage 13B: macOS Sandboxed Bridge execution
+        
+        // 1. Read the profile injected from the UI via Shared App Groups
+        guard let sharedDefaults = UserDefaults(suiteName: "group.com.nexusvpn"),
+              let profileId = sharedDefaults.string(forKey: "TargetProfileID") else {
+            completionHandler(NSError(domain: "NexusVPN", code: 1, userInfo: [NSLocalizedDescriptionKey: "No Profile Selected"]))
+            return
+        }
+        
+        // 2. Init Go Core via gomobile FFI wrapper (`ApiXCFramework`)
+        coreBridge = ApiNewMobileBridge()
+        let tunConfig = coreBridge?.getTunConfig()
+        
+        // 3. Setup NEPacketTunnelNetworkSettings dynamically from Go payload
+        let networkSettings = NEPacketTunnelNetworkSettings(tunnelRemoteAddress: tunConfig?.address ?? "172.19.0.1")
+        networkSettings.ipv4Settings = NEIPv4Settings(addresses: ["172.19.0.2"], subnetMasks: ["255.255.255.252"])
+        networkSettings.ipv4Settings?.includedRoutes = [NEIPv4Route.default()]
+        networkSettings.mtu = NSNumber(value: tunConfig?.mtu ?? 1500)
+        
+        self.setTunnelNetworkSettings(networkSettings) { error in
+            if let error = error {
+                completionHandler(error)
+                return
+            }
+            
+            // 4. Trigger the actual Sing-box runtime inside the Extension Sandbox
+            var connectErr: NSError?
+            self.coreBridge?.connect(profileId, error: &connectErr)
+            
+            if let connectErr = connectErr {
+                completionHandler(connectErr)
+                return
+            }
+            
+            completionHandler(nil)
+        }
+    }
+
+    override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
+        // Deterministic shutdown triggered from macOS System/Sandbox
+        var stopErr: NSError?
+        self.coreBridge?.disconnect(&stopErr)
+        
+        self.coreBridge = nil
+        completionHandler()
+    }
+}

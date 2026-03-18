@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "dgSpecHash": "Dvhk+9nzTxw=",
+  "success": false,
+  "projectFilePath": "C:\\Users\\Pipo\\.gemini\\antigravity\\playground\\cobalt-hawking\\apps\\windows\\NexusVPN\\NexusVPN.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1100",
+      "level": "Error",
+      "message": "Не удалось разрешить \"Microsoft.Windows.SDK.NET.Ref (= 10.0.19041.56)\" для \"net8.0-windows10.0.19041\".",
+      "libraryId": "Microsoft.Windows.SDK.NET.Ref",
+      "targetGraphs": [
+        "net8.0-windows10.0.19041"
+      ]
+    }
+  ]
+}

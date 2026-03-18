@@ -1,0 +1,3 @@
+-keep class nexusvpn.** { *; }
+-keep class go.** { *; }
+-dontwarn go.**

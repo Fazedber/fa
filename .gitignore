@@ -1,0 +1,22 @@
+# Go ignores
+/core/build/
+*.exe
+*.exe~cast
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Android ignores
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# IDEs
+.vscode

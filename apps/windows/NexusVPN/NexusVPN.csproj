@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+    
+    <!-- ⚠️ ИЗМЕНИ ЭТО ЗНАЧЕНИЕ НА PepeWatafa, ЧТОБЫ ПОМЕНЯТЬ БРЕНД СБОРКИ ⚠️ -->
+    <AppBrand>Nebula</AppBrand> 
+  </PropertyGroup>
+
+  <!-- Профиль PepeWatafa -->
+  <PropertyGroup Condition="'$(AppBrand)' == 'PepeWatafa'">
+    <DefineConstants>TRACE;PEPE</DefineConstants>
+    <AssemblyName>PepeWatafa</AssemblyName>
+  </PropertyGroup>
+
+  <!-- Профиль Nebula -->
+  <PropertyGroup Condition="'$(AppBrand)' == 'Nebula'">
+    <DefineConstants>TRACE;NEBULA</DefineConstants>
+    <AssemblyName>Nebula</AssemblyName>
+  </PropertyGroup>
+</Project>

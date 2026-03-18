@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package nexusvpn.api;
+option go_package = "nexusvpn/core/proto/api";
+
+// PlatformBridge - единый контракт для вызова Go Core из C#/Swift/Kotlin
+service PlatformBridge {
+  rpc Connect (ConnectRequest) returns (ConnectResponse);
+  rpc Disconnect (DisconnectRequest) returns (DisconnectResponse);
+  
+  // server streaming дает возможность получать обновления стейт машины на лету (Push)
+  rpc GetState (StateRequest) returns (stream StateResponse);
+  
+  // push статистика раз в секунду
+  rpc GetStats (StatsRequest) returns (stream StatsResponse);
+  
+  rpc ImportConfig (ImportRequest) returns (ImportResponse);
+}
+
+message ConnectRequest {
+  string profile_id = 1;
+}
+message ConnectResponse {}
+
+message DisconnectRequest {}
+message DisconnectResponse {}
+
+message StateRequest {}
+message StateResponse {
+  string state = 1;
+  string error_message = 2;
+}
+
+message StatsRequest {}
+message StatsResponse {
+  uint64 uplink_bytes = 1;
+  uint64 downlink_bytes = 2;
+}
+
+message ImportRequest {
+  string payload = 1; // vless:// link or Base64 yaml
+}
+message ImportResponse {
+  string profile_id = 1;
+}

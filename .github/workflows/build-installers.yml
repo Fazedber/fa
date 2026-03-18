@@ -1,0 +1,194 @@
+name: Build Installers
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g., 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+jobs:
+  build-windows-installer:
+    name: Windows Installer
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install Inno Setup
+      run: |
+        choco install innosetup -y
+        echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+    
+    - name: Build Nebula Installer
+      shell: pwsh
+      run: |
+        cd scripts
+        .\build-installer-windows.ps1 -Brand "Nebula" -Version "${{ github.event.inputs.version || github.ref_name }}"
+    
+    - name: Build PepeWatafa Installer
+      shell: pwsh
+      run: |
+        cd scripts
+        .\build-installer-windows.ps1 -Brand "PepeWatafa" -Version "${{ github.event.inputs.version || github.ref_name }}"
+    
+    - name: Upload Windows Installers
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-installers
+        path: dist/windows/*-Setup.exe
+
+  build-macos-installer:
+    name: macOS Installer
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    
+    - name: Install dependencies
+      run: |
+        brew install create-dmg
+        go install golang.org/x/mobile/cmd/gomobile@latest
+        gomobile init
+    
+    - name: Build Nebula DMG
+      run: |
+        cd scripts
+        export BRAND=Nebula
+        export VERSION="${{ github.event.inputs.version || github.ref_name }}"
+        ./build-installer-macos.sh
+    
+    - name: Build PepeWatafa DMG
+      run: |
+        cd scripts
+        export BRAND=PepeWatafa
+        export VERSION="${{ github.event.inputs.version || github.ref_name }}"
+        ./build-installer-macos.sh
+    
+    - name: Upload macOS Installers
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-installers
+        path: dist/macos/*.dmg
+
+  build-android-apk:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+    
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Install gomobile
+      run: |
+        go install golang.org/x/mobile/cmd/gomobile@latest
+        gomobile init
+    
+    - name: Build APKs
+      run: |
+        cd scripts
+        ./build-android.sh
+    
+    - name: Upload APKs
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apks
+        path: |
+          dist/android/**/*.apk
+          !dist/android/**/intermediates/**
+
+  create-release:
+    name: Create Release
+    needs: [build-windows-installer, build-macos-installer, build-android-apk]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+    
+    - name: List artifacts
+      run: ls -la artifacts/
+    
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: artifacts/*
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        name: "NexusVPN ${{ github.ref_name }}"
+        body: |
+          ## 🚀 NexusVPN ${{ github.ref_name }} Release
+          
+          ### 📦 Installers
+          
+          | Platform | File | Description |
+          |----------|------|-------------|
+          | **Windows** | `NebulaVPN-*-Setup.exe` | Modern GUI installer |
+          | **macOS** | `NebulaVPN-*-macOS.dmg` | Drag & Drop DMG |
+          | **Android** | `app-*-debug.apk` | APK package |
+          
+          ### ⚡ Quick Install
+          
+          **Windows:**
+          ```
+          1. Download .exe file
+          2. Double-click to install
+          3. Launch from Start Menu
+          ```
+          
+          **macOS:**
+          ```
+          1. Download .dmg file
+          2. Open and drag to Applications
+          3. Approve in System Preferences
+          ```
+          
+          **Android:**
+          ```
+          1. Download .apk file
+          2. Enable "Unknown Sources" in settings
+          3. Install and open
+          ```
+          
+          ### ✨ What's New
+          See [CHANGELOG.md](CHANGELOG.md) for full details.
+          
+          ### 🔐 Security
+          All binaries are built automatically from source via GitHub Actions.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
