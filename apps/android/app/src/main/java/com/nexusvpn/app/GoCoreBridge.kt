@@ -1,7 +1,7 @@
 package com.nexusvpn.app
 
-import api.Api
-import api.MobileBridge
+import api.api.Api
+import api.api.MobileBridge
 import org.json.JSONObject
 
 data class TunConfig(
