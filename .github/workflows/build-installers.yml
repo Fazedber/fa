@@ -25,6 +25,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.22'
+        cache-dependency-path: core/go.sum
     
     - name: Set up .NET
       uses: actions/setup-dotnet@v4
@@ -64,6 +65,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.22'
+        cache-dependency-path: core/go.sum
     
     - name: Install dependencies
       run: |
@@ -76,14 +78,14 @@ jobs:
         cd scripts
         export BRAND=Nebula
         export VERSION="${{ github.event.inputs.version || github.ref_name }}"
-        ./build-installer-macos.sh
+        bash ./build-installer-macos.sh
     
     - name: Build PepeWatafa DMG
       run: |
         cd scripts
         export BRAND=PepeWatafa
         export VERSION="${{ github.event.inputs.version || github.ref_name }}"
-        ./build-installer-macos.sh
+        bash ./build-installer-macos.sh
     
     - name: Upload macOS Installers
       uses: actions/upload-artifact@v4
@@ -101,6 +103,7 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: '1.22'
+        cache-dependency-path: core/go.sum
     
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -119,7 +122,7 @@ jobs:
     - name: Build APKs
       run: |
         cd scripts
-        ./build-android.sh
+        bash ./build-android.sh
     
     - name: Upload APKs
       uses: actions/upload-artifact@v4
