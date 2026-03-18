@@ -120,18 +120,18 @@ jobs:
         id: preflight
         shell: bash
         run: |
-          if [ -f "apps/macos/NexusVPN.xcodeproj/project.pbxproj" ]; then
+          if [ -f "apps/macos/project.yml" ]; then
             echo "ready=true" >> "$GITHUB_OUTPUT"
           else
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::notice title=macOS skipped::apps/macos/NexusVPN.xcodeproj is missing. macOS installer packaging is disabled until the Xcode project and signing assets exist."
+            echo "::notice title=macOS skipped::apps/macos/project.yml is missing. macOS installer packaging is disabled until the project spec exists."
           fi
 
       - name: Install dependencies
         if: steps.preflight.outputs.ready == 'true'
         shell: bash
         run: |
-          brew install create-dmg
+          brew install create-dmg xcodegen
           go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
           gomobile init
 

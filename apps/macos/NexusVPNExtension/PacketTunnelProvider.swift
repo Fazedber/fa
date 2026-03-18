@@ -17,8 +17,20 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             return
         }
         
+        guard let sharedContainer = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.nexusvpn") else {
+            completionHandler(NSError(domain: "NexusVPN", code: 2, userInfo: [NSLocalizedDescriptionKey: "Shared App Group container is unavailable"]))
+            return
+        }
+
+        let dbPath = sharedContainer.appendingPathComponent("nexusvpn.db").path
+
         // 2. Init Go Core via gomobile FFI wrapper (`ApiXCFramework`)
-        coreBridge = ApiNewMobileBridge()
+        var initErr: NSError?
+        coreBridge = ApiNewMobileBridge(dbPath, &initErr)
+        if let initErr {
+            completionHandler(initErr)
+            return
+        }
         let tunConfig = coreBridge?.getTunConfig()
         
         // 3. Setup NEPacketTunnelNetworkSettings dynamically from Go payload

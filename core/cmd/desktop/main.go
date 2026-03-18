@@ -13,8 +13,6 @@ import (
 	"nexusvpn/core/engine"
 	"nexusvpn/core/logging"
 	"nexusvpn/core/storage"
-
-	"golang.org/x/sys/windows/svc"
 )
 
 func main() {
@@ -39,13 +37,10 @@ func main() {
 	}
 
 	// 3. Stage 10A: NT Service Injection check
-	if runtime.GOOS == "windows" {
-		isInteractive, err := svc.IsAnInteractiveSession()
-		if err == nil && !isInteractive {
-			slog.Info("Execution detected inside Windows SCM (NT Service)")
-			runWindowsService(token, db)
-			return
-		}
+	if runtime.GOOS == "windows" && isWindowsServiceSession() {
+		slog.Info("Execution detected inside Windows SCM (NT Service)")
+		runWindowsService(token, db)
+		return
 	}
 
 	adapter := engine.NewSingBoxAdapter()

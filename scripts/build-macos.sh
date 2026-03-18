@@ -24,6 +24,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 PROJECT_DIR="$REPO_ROOT/apps/macos"
+PROJECT_SPEC="$PROJECT_DIR/project.yml"
 PROJECT_FILE="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
 
@@ -39,8 +40,8 @@ if ! command -v xcodebuild >/dev/null 2>&1; then
     exit 1
 fi
 
-if [ ! -f "$PROJECT_FILE" ]; then
-    echo -e "${RED}Missing Xcode project: $PROJECT_FILE${NC}"
+if [ ! -f "$PROJECT_SPEC" ]; then
+    echo -e "${RED}Missing XcodeGen spec: $PROJECT_SPEC${NC}"
     exit 1
 fi
 
@@ -48,6 +49,11 @@ if ! command -v gomobile >/dev/null 2>&1; then
     echo -e "${YELLOW}Installing gomobile...${NC}"
     go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
     gomobile init
+fi
+
+if ! command -v xcodegen >/dev/null 2>&1; then
+    echo -e "${YELLOW}Installing xcodegen...${NC}"
+    brew install xcodegen
 fi
 
 echo -e "${GREEN}  All prerequisites met${NC}"
@@ -68,6 +74,7 @@ echo -e "${GREEN}  Core XCFramework built${NC}"
 echo -e "${YELLOW}[2/3] Preparing Xcode project...${NC}"
 rm -rf "$PROJECT_DIR/NexusVPN/Api.xcframework" 2>/dev/null || true
 cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
+xcodegen generate --spec "$PROJECT_SPEC" --project "$PROJECT_DIR"
 
 cd "$PROJECT_DIR"
 

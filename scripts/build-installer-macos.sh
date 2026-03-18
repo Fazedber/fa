@@ -34,6 +34,11 @@ if ! command -v create-dmg >/dev/null 2>&1; then
     brew install create-dmg
 fi
 
+if ! command -v xcodegen >/dev/null 2>&1; then
+    echo -e "${YELLOW}Installing xcodegen...${NC}"
+    brew install xcodegen
+fi
+
 echo -e "${GREEN}  All prerequisites met${NC}"
 
 echo -e "${YELLOW}[1/4] Building macOS app...${NC}"
