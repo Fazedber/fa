@@ -1,4 +1,4 @@
-# NexusVPN
+# NebulaVPN
 
 [![Build](https://github.com/yourusername/nexusvpn/actions/workflows/build.yml/badge.svg)](https://github.com/yourusername/nexusvpn/actions)
 [![Go Version](https://img.shields.io/badge/Go-1.22-blue)](https://go.dev)
