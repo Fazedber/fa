@@ -13,10 +13,6 @@ import (
 	"nexusvpn/core/proto/api"
 )
 
-type GrpcAdapter struct {
-	coreBridge PlatformBridge
-}
-
 // authInterceptor secures localhost IPC by validating the Bearer token
 func authInterceptor(expectedToken string) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

@@ -214,11 +214,6 @@ func _PlatformBridge_GetState_Handler(srv interface{}, stream grpc.ServerStream)
 	return srv.(PlatformBridgeServer).GetState(m, &platformBridgeGetStateServer{stream})
 }
 
-type PlatformBridge_GetStateServer interface {
-	Send(*StateResponse) error
-	grpc.ServerStream
-}
-
 type platformBridgeGetStateServer struct {
 	grpc.ServerStream
 }
@@ -233,11 +228,6 @@ func _PlatformBridge_GetStats_Handler(srv interface{}, stream grpc.ServerStream)
 		return err
 	}
 	return srv.(PlatformBridgeServer).GetStats(m, &platformBridgeGetStatsServer{stream})
-}
-
-type PlatformBridge_GetStatsServer interface {
-	Send(*StatsResponse) error
-	grpc.ServerStream
 }
 
 type platformBridgeGetStatsServer struct {

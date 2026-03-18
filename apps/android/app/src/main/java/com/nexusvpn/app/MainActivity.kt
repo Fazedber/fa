@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         // Load embedded SQLite & Go Machine
-        GoCoreBridge.initCore()
+        GoCoreBridge.initCore(filesDir.resolve("nexusvpn.db").absolutePath)
 
         setContent {
             NexusVPNTheme {

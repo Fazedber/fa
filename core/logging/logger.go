@@ -54,7 +54,7 @@ func (h *redactionHandler) Handle(ctx context.Context, r slog.Record) error {
 	})
 	
 	// Create new record with redacted attributes
-	newRecord := slog.NewRecord(r.Time, r.Level, r.Message, r.PC())
+	newRecord := slog.NewRecord(r.Time, r.Level, r.Message, r.PC)
 	for _, attr := range attrs {
 		newRecord.AddAttrs(attr)
 	}

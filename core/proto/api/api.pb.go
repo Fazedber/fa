@@ -1,285 +1,175 @@
-// Code generated manually for NexusVPN. DO NOT EDIT.
+// Code generated manually for NexusVPN compatibility. DO NOT EDIT.
 // source: proto/api.proto
 
 package api
 
-import (
-	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
-	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
-)
+import proto "github.com/golang/protobuf/proto"
 
-const (
-	// Verify that this generated code is sufficiently up-to-date.
-	_ = protoimpl.EnforceVersion(20 - protoimpl.MinVersion)
-	// Verify that runtime/protoimpl is sufficiently up-to-date.
-	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
-)
+const _ = proto.ProtoPackageIsVersion4
 
 type ConnectRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	ProfileId string `protobuf:"bytes,1,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
 }
 
-func (x *ConnectRequest) Reset() {
-	*x = ConnectRequest{}
+func (m *ConnectRequest) Reset()         { *m = ConnectRequest{} }
+func (m *ConnectRequest) String() string { return proto.CompactTextString(m) }
+func (*ConnectRequest) ProtoMessage()    {}
+func (*ConnectRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{0}
 }
 
-func (x *ConnectRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConnectRequest) ProtoMessage() {}
-
-func (x *ConnectRequest) GetProfileId() string {
-	if x != nil {
-		return x.ProfileId
+func (m *ConnectRequest) GetProfileId() string {
+	if m != nil {
+		return m.ProfileId
 	}
 	return ""
 }
 
-type ConnectResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
+type ConnectResponse struct{}
+
+func (m *ConnectResponse) Reset()         { *m = ConnectResponse{} }
+func (m *ConnectResponse) String() string { return proto.CompactTextString(m) }
+func (*ConnectResponse) ProtoMessage()    {}
+func (*ConnectResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{1}
 }
 
-func (x *ConnectResponse) Reset() {
-	*x = ConnectResponse{}
+type DisconnectRequest struct{}
+
+func (m *DisconnectRequest) Reset()         { *m = DisconnectRequest{} }
+func (m *DisconnectRequest) String() string { return proto.CompactTextString(m) }
+func (*DisconnectRequest) ProtoMessage()    {}
+func (*DisconnectRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{2}
 }
 
-func (x *ConnectResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
+type DisconnectResponse struct{}
+
+func (m *DisconnectResponse) Reset()         { *m = DisconnectResponse{} }
+func (m *DisconnectResponse) String() string { return proto.CompactTextString(m) }
+func (*DisconnectResponse) ProtoMessage()    {}
+func (*DisconnectResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{3}
 }
 
-func (*ConnectResponse) ProtoMessage() {}
+type StateRequest struct{}
 
-type DisconnectRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
+func (m *StateRequest) Reset()         { *m = StateRequest{} }
+func (m *StateRequest) String() string { return proto.CompactTextString(m) }
+func (*StateRequest) ProtoMessage()    {}
+func (*StateRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{4}
 }
-
-func (x *DisconnectRequest) Reset() {
-	*x = DisconnectRequest{}
-}
-
-func (x *DisconnectRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DisconnectRequest) ProtoMessage() {}
-
-type DisconnectResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *DisconnectResponse) Reset() {
-	*x = DisconnectResponse{}
-}
-
-func (x *DisconnectResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DisconnectResponse) ProtoMessage() {}
-
-type StateRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *StateRequest) Reset() {
-	*x = StateRequest{}
-}
-
-func (x *StateRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StateRequest) ProtoMessage() {}
 
 type StateResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	State        string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
 	ErrorMessage string `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
 }
 
-func (x *StateResponse) Reset() {
-	*x = StateResponse{}
+func (m *StateResponse) Reset()         { *m = StateResponse{} }
+func (m *StateResponse) String() string { return proto.CompactTextString(m) }
+func (*StateResponse) ProtoMessage()    {}
+func (*StateResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{5}
 }
 
-func (x *StateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StateResponse) ProtoMessage() {}
-
-func (x *StateResponse) GetState() string {
-	if x != nil {
-		return x.State
+func (m *StateResponse) GetState() string {
+	if m != nil {
+		return m.State
 	}
 	return ""
 }
 
-func (x *StateResponse) GetErrorMessage() string {
-	if x != nil {
-		return x.ErrorMessage
+func (m *StateResponse) GetErrorMessage() string {
+	if m != nil {
+		return m.ErrorMessage
 	}
 	return ""
 }
 
-type StatsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
+type StatsRequest struct{}
 
-func (x *StatsRequest) Reset() {
-	*x = StatsRequest{}
+func (m *StatsRequest) Reset()         { *m = StatsRequest{} }
+func (m *StatsRequest) String() string { return proto.CompactTextString(m) }
+func (*StatsRequest) ProtoMessage()    {}
+func (*StatsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{6}
 }
-
-func (x *StatsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatsRequest) ProtoMessage() {}
 
 type StatsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	UplinkBytes   uint64 `protobuf:"varint,1,opt,name=uplink_bytes,json=uplinkBytes,proto3" json:"uplink_bytes,omitempty"`
 	DownlinkBytes uint64 `protobuf:"varint,2,opt,name=downlink_bytes,json=downlinkBytes,proto3" json:"downlink_bytes,omitempty"`
 }
 
-func (x *StatsResponse) Reset() {
-	*x = StatsResponse{}
+func (m *StatsResponse) Reset()         { *m = StatsResponse{} }
+func (m *StatsResponse) String() string { return proto.CompactTextString(m) }
+func (*StatsResponse) ProtoMessage()    {}
+func (*StatsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{7}
 }
 
-func (x *StatsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatsResponse) ProtoMessage() {}
-
-func (x *StatsResponse) GetUplinkBytes() uint64 {
-	if x != nil {
-		return x.UplinkBytes
+func (m *StatsResponse) GetUplinkBytes() uint64 {
+	if m != nil {
+		return m.UplinkBytes
 	}
 	return 0
 }
 
-func (x *StatsResponse) GetDownlinkBytes() uint64 {
-	if x != nil {
-		return x.DownlinkBytes
+func (m *StatsResponse) GetDownlinkBytes() uint64 {
+	if m != nil {
+		return m.DownlinkBytes
 	}
 	return 0
 }
 
 type ImportRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	Payload string `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
-func (x *ImportRequest) Reset() {
-	*x = ImportRequest{}
+func (m *ImportRequest) Reset()         { *m = ImportRequest{} }
+func (m *ImportRequest) String() string { return proto.CompactTextString(m) }
+func (*ImportRequest) ProtoMessage()    {}
+func (*ImportRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{8}
 }
 
-func (x *ImportRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ImportRequest) ProtoMessage() {}
-
-func (x *ImportRequest) GetPayload() string {
-	if x != nil {
-		return x.Payload
+func (m *ImportRequest) GetPayload() string {
+	if m != nil {
+		return m.Payload
 	}
 	return ""
 }
 
 type ImportResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
 	ProfileId string `protobuf:"bytes,1,opt,name=profile_id,json=profileId,proto3" json:"profile_id,omitempty"`
 }
 
-func (x *ImportResponse) Reset() {
-	*x = ImportResponse{}
+func (m *ImportResponse) Reset()         { *m = ImportResponse{} }
+func (m *ImportResponse) String() string { return proto.CompactTextString(m) }
+func (*ImportResponse) ProtoMessage()    {}
+func (*ImportResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptorProtoAPI, []int{9}
 }
 
-func (x *ImportResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ImportResponse) ProtoMessage() {}
-
-func (x *ImportResponse) GetProfileId() string {
-	if x != nil {
-		return x.ProfileId
+func (m *ImportResponse) GetProfileId() string {
+	if m != nil {
+		return m.ProfileId
 	}
 	return ""
 }
 
-var File_proto_api_proto protoreflect.FileDescriptor
-
-var file_proto_api_proto_rawDesc = []byte{
-	// Minimal descriptor for compilation
-}
-
-var (
-	file_proto_api_proto_goTypes = []interface{}{
-		(*ConnectRequest)(nil),
-		(*ConnectResponse)(nil),
-		(*DisconnectRequest)(nil),
-		(*DisconnectResponse)(nil),
-		(*StateRequest)(nil),
-		(*StateResponse)(nil),
-		(*StatsRequest)(nil),
-		(*StatsResponse)(nil),
-		(*ImportRequest)(nil),
-		(*ImportResponse)(nil),
-	}
-)
-
-func file_proto_api_proto_init() {
-	if File_proto_api_proto != nil {
-		return
-	}
-	type x struct{}
-	out := protoimpl.TypeBuilder{
-		File: protoimpl.DescBuilder{
-			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_api_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   10,
-			NumExtensions: 0,
-			NumServices:   1,
-		},
-		GoTypes:           file_proto_api_proto_goTypes,
-		DependencyIndexes: nil,
-	}
-	out.File = out.File
-	File_proto_api_proto = out.File
-}
+var fileDescriptorProtoAPI = []byte{}
 
 func init() {
-	file_proto_api_proto_init()
+	proto.RegisterType((*ConnectRequest)(nil), "nexusvpn.api.ConnectRequest")
+	proto.RegisterType((*ConnectResponse)(nil), "nexusvpn.api.ConnectResponse")
+	proto.RegisterType((*DisconnectRequest)(nil), "nexusvpn.api.DisconnectRequest")
+	proto.RegisterType((*DisconnectResponse)(nil), "nexusvpn.api.DisconnectResponse")
+	proto.RegisterType((*StateRequest)(nil), "nexusvpn.api.StateRequest")
+	proto.RegisterType((*StateResponse)(nil), "nexusvpn.api.StateResponse")
+	proto.RegisterType((*StatsRequest)(nil), "nexusvpn.api.StatsRequest")
+	proto.RegisterType((*StatsResponse)(nil), "nexusvpn.api.StatsResponse")
+	proto.RegisterType((*ImportRequest)(nil), "nexusvpn.api.ImportRequest")
+	proto.RegisterType((*ImportResponse)(nil), "nexusvpn.api.ImportResponse")
+	proto.RegisterFile("proto/api.proto", fileDescriptorProtoAPI)
 }

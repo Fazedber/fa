@@ -1,12 +1,20 @@
 ; Inno Setup 6 - Modern Installer for NexusVPN
 ; Requires: Inno Setup 6.2+
 
-#define Brand "Nebula"
-#define BrandLower "nebula"
-#define Version "1.0.0"
+#ifndef Brand
+  #define Brand "Nebula"
+#endif
+#ifndef BrandLower
+  #define BrandLower "nebula"
+#endif
+#ifndef Version
+  #define Version "1.0.0"
+#endif
 #define Publisher "NexusVPN Team"
 #define URL "https://github.com/nexusvpn/nexusvpn"
-#define ExeName "Nebula.exe"
+#ifndef ExeName
+  #define ExeName "Nebula.exe"
+#endif
 #define CoreName "nexus-core.exe"
 
 [Setup]
@@ -23,15 +31,12 @@ AllowNoIcons=yes
 LicenseFile=..\LICENSE
 OutputDir=..\dist\windows
 OutputBaseFilename={#Brand}VPN-{#Version}-Setup
-SetupIconFile=..\assets\icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=dialog
 WizardStyle=modern
 WizardSizePercent=100,100
-WizardImageFile=..\assets\installer-wizard.bmp
-WizardSmallImageFile=..\assets\installer-small.bmp
 UninstallDisplayIcon={app}\{#CoreName}
 UninstallDisplayName={#Brand} VPN
 UninstallFilesDir={app}\uninstall
@@ -57,14 +62,11 @@ Source: "..\dist\windows\{#Brand}\UI\{#ExeName}"; DestDir: "{app}\UI"; Flags: ig
 Source: "..\dist\windows\{#Brand}\UI\*.dll"; DestDir: "{app}\UI"; Flags: ignoreversion recursesubdirs
 Source: "..\dist\windows\{#Brand}\UI\*.runtimeconfig.json"; DestDir: "{app}\UI"; Flags: ignoreversion
 
-; Assets
-Source: "..\assets\icon.ico"; DestDir: "{app}"; Flags: ignoreversion
-
 [Icons]
-Name: "{autoprograms}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; IconFilename: "{app}\icon.ico"
-Name: "{autodesktop}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; IconFilename: "{app}\icon.ico"; Tasks: desktopicon
-Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; IconFilename: "{app}\icon.ico"; Tasks: quicklaunchicon
-Name: "{autostartup}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; IconFilename: "{app}\icon.ico"; Tasks: startup
+Name: "{autoprograms}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"
+Name: "{autodesktop}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; Tasks: desktopicon
+Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; Tasks: quicklaunchicon
+Name: "{autostartup}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; Tasks: startup
 
 [Run]
 ; Install and start Windows service

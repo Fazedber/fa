@@ -57,7 +57,18 @@ if (-not (Test-Path $IssFile)) {
 }
 
 # Build with Inno Setup
-& $ISCC /Q /O"..\dist\windows" /F"$Brand-VPN-$Version-Setup" $IssFile
+$brandLower = $Brand.ToLowerInvariant()
+$exeName = if ($Brand -eq "PepeWatafa") { "PepeWatafa.exe" } else { "Nebula.exe" }
+
+& $ISCC `
+    "/DBrand=$Brand" `
+    "/DBrandLower=$brandLower" `
+    "/DVersion=$Version" `
+    "/DExeName=$exeName" `
+    /Q `
+    /O"..\dist\windows" `
+    /F"$Brand-VPN-$Version-Setup" `
+    $IssFile
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Inno Setup build failed!"

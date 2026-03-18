@@ -1,119 +1,36 @@
-name: core-build
+name: Core Build
 
 on:
   push:
-    branches: [ "main", "release/*" ]
+    branches: ["main", "release/*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
-  GO_VERSION: '1.22.0'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  GO_VERSION: "1.22.0"
 
 jobs:
   verify:
+    name: Verify Go Core
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ env.GO_VERSION }}
-        cache: true
-    - name: Resolve Go Modules
-      run: |
-        cd core
-        go get ./...
-        go mod tidy
+      - uses: actions/checkout@v6
 
-    - name: Verify modules
-      run: |
-        cd core
-        go mod download
-        go mod verify
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
 
-  build-windows:
-    needs: verify
-    runs-on: windows-2022
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - name: Resolve Go Modules
-      run: |
-        cd core
-        go get ./...
-        go mod tidy
+      - name: Download dependencies
+        working-directory: ./core
+        run: go mod download
 
-    - name: Build Core Daemon
-      run: |
-        cd core
-        go build -tags netgo -trimpath -ldflags "-H=windowsgui -w -s -X main.version=${{ github.sha }}" -o dist/NexusVPNService.exe ./cmd/desktop
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: windows-service
-        path: core/dist/NexusVPNService.exe
+      - name: Verify modules
+        working-directory: ./core
+        run: go mod verify
 
-  build-android-bridge:
-    needs: verify
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - name: Resolve Go Modules
-      run: |
-        cd core
-        go get ./...
-        go mod tidy
-
-    - name: Install NDK and Gomobile
-      run: |
-        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20231127183840-76ac6878022f
-        gomobile init
-    - name: Bind Android AAR
-      run: |
-        cd core
-        gomobile bind -target=android/arm64,android/amd64 -o dist/core.aar ./api
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: android-aar
-        path: core/dist/core.aar
-
-  build-macos-bridge:
-    needs: verify
-    runs-on: macos-14
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ env.GO_VERSION }}
-    - name: Resolve Go Modules
-      run: |
-        cd core
-        go get ./...
-        go mod tidy
-
-    - name: Bind macOS Framework
-      run: |
-        go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20231127183840-76ac6878022f
-        gomobile init
-        cd core
-        gomobile bind -target=macos -o dist/Api.xcframework ./api
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: macos-xcframework
-        path: core/dist/Api.xcframework
-
+      - name: Run tests
+        working-directory: ./core
+        run: go test ./...

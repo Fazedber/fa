@@ -47,7 +47,7 @@ Write-Host "`n[1/3] Building Go Core..." -ForegroundColor Yellow
 Push-Location (Join-Path $PSScriptRoot "..\core")
 try {
     $env:CGO_ENABLED = "0"
-    go mod tidy
+    go mod download
     go build -ldflags="-s -w -trimpath" -o "$BuildDir\nexus-core.exe" .\cmd\desktop
     Write-Host "  Core built: $BuildDir\nexus-core.exe" -ForegroundColor Green
 } finally {

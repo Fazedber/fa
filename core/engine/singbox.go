@@ -9,7 +9,7 @@ import (
 	"time"
 	
 	"nexusvpn/core/config"
-	"github.com/sagernet/sing-box/box"
+	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/option"
 	
 	_ "github.com/sagernet/sing-box/include"
