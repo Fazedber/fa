@@ -114,24 +114,32 @@ prepare_mobile_env() {
     fi
 
     export PATH="$toolchain_bin:$PATH"
-    if [ -x "$toolchain_bin/clang" ]; then
+    primary_cc="$toolchain_bin/aarch64-linux-android21-clang"
+    primary_cxx="$toolchain_bin/aarch64-linux-android21-clang++"
+    if [ -x "$primary_cc" ]; then
+        export CC="${CC:-$primary_cc}"
+        export CXX="${CXX:-$primary_cxx}"
+        export CC_FOR_TARGET="${CC_FOR_TARGET:-$primary_cc}"
+        export CXX_FOR_TARGET="${CXX_FOR_TARGET:-$primary_cxx}"
+        export AR="${AR:-$toolchain_bin/llvm-ar}"
+    elif [ -x "$toolchain_bin/clang" ]; then
         export CC="${CC:-$toolchain_bin/clang}"
         export CXX="${CXX:-$toolchain_bin/clang++}"
+        export CC_FOR_TARGET="${CC_FOR_TARGET:-$toolchain_bin/clang}"
+        export CXX_FOR_TARGET="${CXX_FOR_TARGET:-$toolchain_bin/clang++}"
         export AR="${AR:-$toolchain_bin/llvm-ar}"
     elif [ -x "$toolchain_bin/clang.exe" ]; then
         export CC="${CC:-$toolchain_bin/clang.exe}"
         export CXX="${CXX:-$toolchain_bin/clang++.exe}"
+        export CC_FOR_TARGET="${CC_FOR_TARGET:-$toolchain_bin/clang.exe}"
+        export CXX_FOR_TARGET="${CXX_FOR_TARGET:-$toolchain_bin/clang++.exe}"
         export AR="${AR:-$toolchain_bin/llvm-ar.exe}"
     else
         echo -e "${RED}clang was not found in ${toolchain_bin}${NC}"
         exit 1
     fi
 
-    # gomobile bind can bootstrap its own toolchain, so treat init as a cache warmup,
-    # not as a hard requirement that blocks the whole Android pipeline.
-    if ! gomobile init; then
-        echo "::warning::gomobile init failed; continuing with direct gomobile bind"
-    fi
+    mkdir -p "$(go env GOPATH)/pkg/gomobile"
 }
 
 build_aar() {

@@ -58,9 +58,7 @@ Name: "startup"; Description: "Start {#Brand} VPN on Windows startup"; GroupDesc
 [Files]
 ; Core service
 Source: "..\dist\windows\{#Brand}\{#CoreName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\dist\windows\{#Brand}\UI\{#ExeName}"; DestDir: "{app}\UI"; Flags: ignoreversion
-Source: "..\dist\windows\{#Brand}\UI\*.dll"; DestDir: "{app}\UI"; Flags: ignoreversion recursesubdirs
-Source: "..\dist\windows\{#Brand}\UI\*.runtimeconfig.json"; DestDir: "{app}\UI"; Flags: ignoreversion
+Source: "..\dist\windows\{#Brand}\UI\*"; DestDir: "{app}\UI"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{autoprograms}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"

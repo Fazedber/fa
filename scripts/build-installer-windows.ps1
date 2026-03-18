@@ -62,7 +62,17 @@ if (-not (Test-Path $IssFile)) {
 
 # Build with Inno Setup
 $brandLower = $Brand.ToLowerInvariant()
-$exeName = if ($Brand -eq "PepeWatafa") { "PepeWatafa.exe" } else { "Nebula.exe" }
+$UiOutputDir = Join-Path $WindowsDistDir "$Brand\UI"
+$UiExe = Get-ChildItem -Path $UiOutputDir -Filter *.exe -File |
+    Where-Object { $_.Name -notlike "*Service*" -and $_.Name -ne "nexus-core.exe" } |
+    Select-Object -First 1
+
+if (-not $UiExe) {
+    Write-Error "Published Windows UI executable was not found in $UiOutputDir"
+    exit 1
+}
+
+$exeName = $UiExe.Name
 
 & $ISCC `
     "/DBrand=$Brand" `
