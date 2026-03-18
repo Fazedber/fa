@@ -1,0 +1,87 @@
+name: NexusVPN
+options:
+  minimumXcodeGenVersion: 2.44.0
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: 5.0
+    PRODUCT_NAME: NexusVPN
+    MARKETING_VERSION: 1.0
+    CURRENT_PROJECT_VERSION: 1
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGN_IDENTITY: ""
+    DEVELOPMENT_TEAM: ""
+    MACOSX_DEPLOYMENT_TARGET: 14.0
+    SUPPORTED_PLATFORMS: macosx
+
+targets:
+  NexusVPN:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nexusvpn.app
+    sources:
+      - path: NexusVPN
+        excludes:
+          - Api.xcframework
+    dependencies:
+      - sdk: SwiftUI.framework
+      - sdk: AppKit.framework
+      - sdk: NetworkExtension.framework
+      - framework: NexusVPN/Api.xcframework
+        embed: true
+        codeSign: false
+      - target: NexusVPNExtension
+        embed: true
+        codeSign: false
+        copy:
+          destination: plugins
+    info:
+      path: NexusVPN/Info.plist
+      properties:
+        CFBundleDisplayName: NexusVPN
+        CFBundleName: NexusVPN
+        CFBundleShortVersionString: 1.0
+        CFBundleVersion: 1
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+
+  NexusVPNExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: NexusVPNExtension
+    dependencies:
+      - sdk: Foundation.framework
+      - sdk: NetworkExtension.framework
+      - framework: NexusVPN/Api.xcframework
+        codeSign: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nexusvpn.app.extension
+        INFOPLIST_KEY_CFBundleDisplayName: NexusVPNExtension
+    info:
+      path: NexusVPNExtension/Info.plist
+      properties:
+        CFBundleDisplayName: NexusVPNExtension
+        CFBundleName: NexusVPNExtension
+        CFBundlePackageType: XPC!
+        CFBundleShortVersionString: 1.0
+        CFBundleVersion: 1
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+
+schemes:
+  NexusVPN:
+    build:
+      targets:
+        NexusVPN: all
+        NexusVPNExtension: all

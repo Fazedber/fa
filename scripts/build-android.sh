@@ -30,6 +30,26 @@ ANDROID_PROJECT_DIR="$REPO_ROOT/apps/android"
 ANDROID_APP_LIBS_DIR="$ANDROID_PROJECT_DIR/app/libs"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
 
+detect_ndk_host_tag() {
+    case "$(uname -s)-$(uname -m)" in
+        Linux-x86_64)
+            echo "linux-x86_64"
+            ;;
+        Darwin-arm64)
+            echo "darwin-arm64"
+            ;;
+        Darwin-x86_64)
+            echo "darwin-x86_64"
+            ;;
+        MINGW*-x86_64|MSYS*-x86_64|CYGWIN*-x86_64)
+            echo "windows-x86_64"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
 check_prereqs() {
     echo -e "${YELLOW}Checking prerequisites...${NC}"
 
@@ -81,6 +101,32 @@ prepare_mobile_env() {
     export ANDROID_NDK_ROOT="${ANDROID_NDK_HOME}"
     export NDK_HOME="${ANDROID_NDK_HOME}"
 
+    host_tag="$(detect_ndk_host_tag || true)"
+    if [ -z "$host_tag" ]; then
+        echo -e "${RED}Unsupported host platform for Android NDK toolchain: $(uname -s)-$(uname -m)${NC}"
+        exit 1
+    fi
+
+    toolchain_bin="${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/${host_tag}/bin"
+    if [ ! -d "$toolchain_bin" ]; then
+        echo -e "${RED}Android NDK LLVM toolchain was not found at ${toolchain_bin}${NC}"
+        exit 1
+    fi
+
+    export PATH="$toolchain_bin:$PATH"
+    if [ -x "$toolchain_bin/clang" ]; then
+        export CC="${CC:-$toolchain_bin/clang}"
+        export CXX="${CXX:-$toolchain_bin/clang++}"
+        export AR="${AR:-$toolchain_bin/llvm-ar}"
+    elif [ -x "$toolchain_bin/clang.exe" ]; then
+        export CC="${CC:-$toolchain_bin/clang.exe}"
+        export CXX="${CXX:-$toolchain_bin/clang++.exe}"
+        export AR="${AR:-$toolchain_bin/llvm-ar.exe}"
+    else
+        echo -e "${RED}clang was not found in ${toolchain_bin}${NC}"
+        exit 1
+    fi
+
     # gomobile bind can bootstrap its own toolchain, so treat init as a cache warmup,
     # not as a hard requirement that blocks the whole Android pipeline.
     if ! gomobile init; then
@@ -104,6 +150,7 @@ build_aar() {
 prepare_android_project() {
     echo -e "${YELLOW}[2/3] Preparing Android project...${NC}"
     mkdir -p "$ANDROID_APP_LIBS_DIR"
+    rm -f "$ANDROID_APP_LIBS_DIR/core.aar"
     cp "$BUILD_DIR/core.aar" "$ANDROID_APP_LIBS_DIR/core.aar"
 }
 
@@ -119,20 +166,22 @@ build_apk() {
 
     if [ "$BUILD_TYPE" = "release" ]; then
         "$GRADLE_BIN" --no-daemon --stacktrace assemble${BRAND^}Release
-        APK_PATH="app/build/outputs/apk/${BRAND}/release/app-${BRAND}-release-unsigned.apk"
-
-        if [ -f "$APK_PATH" ]; then
-            cp "$APK_PATH" "$BUILD_DIR/${BRAND}-unsigned.apk"
-            echo -e "${YELLOW}  Note: APK is unsigned. Sign it before distribution.${NC}"
+        APK_PATH="$(find app/build/outputs/apk -type f -name '*.apk' | sort | tail -n 1)"
+        if [ -z "$APK_PATH" ]; then
+            echo -e "${RED}Failed to locate the built release APK${NC}"
+            exit 1
         fi
+        cp "$APK_PATH" "$BUILD_DIR/${BRAND}-unsigned.apk"
+        echo -e "${YELLOW}  Note: APK is unsigned. Sign it before distribution.${NC}"
     else
         "$GRADLE_BIN" --no-daemon --stacktrace assemble${BRAND^}Debug
-        APK_PATH="app/build/outputs/apk/${BRAND}/debug/app-${BRAND}-debug.apk"
-
-        if [ -f "$APK_PATH" ]; then
-            cp "$APK_PATH" "$BUILD_DIR/${BRAND}-debug.apk"
-            echo -e "${GREEN}  APK built: $BUILD_DIR/${BRAND}-debug.apk${NC}"
+        APK_PATH="$(find app/build/outputs/apk -type f -name '*.apk' | sort | tail -n 1)"
+        if [ -z "$APK_PATH" ]; then
+            echo -e "${RED}Failed to locate the built debug APK${NC}"
+            exit 1
         fi
+        cp "$APK_PATH" "$BUILD_DIR/${BRAND}-debug.apk"
+        echo -e "${GREEN}  APK built: $BUILD_DIR/${BRAND}-debug.apk${NC}"
     fi
 }
 

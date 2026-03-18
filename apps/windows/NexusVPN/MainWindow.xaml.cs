@@ -57,20 +57,20 @@ namespace NexusVPN
                 {
                     BtnText.Text = "DISCONNECT";
                     // Transition to Neon Cyan glowing effect (Glassmorphism)
-                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(100, 0, 255, 204));
-                    StatusText.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 255, 204));
+                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(100, 0, 255, 204));
+                    StatusText.Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 0, 255, 204));
                 }
                 else if (newState == "CONNECTING" || newState == "RECONNECTING")
                 {
                     BtnText.Text = "CONNECTING...";
                     // Orange glow for trying to connect
-                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(100, 255, 170, 0)); 
+                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(100, 255, 170, 0));
                 }
                 else
                 {
                     BtnText.Text = "CONNECT";
                     // Reset to unlit state
-                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(50, 68, 68, 68));
+                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(50, 68, 68, 68));
                     StatusText.Foreground = new SolidColorBrush(Colors.DarkGray);
                 }
             });

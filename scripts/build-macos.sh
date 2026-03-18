@@ -26,8 +26,20 @@ NC='\033[0m'
 
 PROJECT_DIR="$REPO_ROOT/apps/macos"
 PROJECT_SPEC="$PROJECT_DIR/project.yml"
+CI_PROJECT_SPEC="$PROJECT_DIR/project.ci.yml"
 PROJECT_FILE="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
+ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+
+select_project_spec() {
+    if [ "${MACOS_SIGNED_BUILD:-0}" = "1" ] || [ -n "${DEVELOPER_ID:-}" ]; then
+        ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+    elif [ -f "$CI_PROJECT_SPEC" ]; then
+        ACTIVE_PROJECT_SPEC="$CI_PROJECT_SPEC"
+    else
+        ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+    fi
+}
 
 check_prereqs() {
     echo -e "${YELLOW}Checking prerequisites...${NC}"
@@ -42,8 +54,8 @@ check_prereqs() {
         exit 1
     fi
 
-    if [ ! -f "$PROJECT_SPEC" ]; then
-        echo -e "${RED}Missing XcodeGen spec: $PROJECT_SPEC${NC}"
+    if [ ! -f "$ACTIVE_PROJECT_SPEC" ]; then
+        echo -e "${RED}Missing XcodeGen spec: $ACTIVE_PROJECT_SPEC${NC}"
         exit 1
     fi
 
@@ -88,7 +100,7 @@ prepare_xcode_project() {
     cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
     (
         cd "$PROJECT_DIR"
-        xcodegen generate --spec "$PROJECT_SPEC"
+        xcodegen generate --spec "$ACTIVE_PROJECT_SPEC"
     )
 
     if [ ! -d "$PROJECT_DIR/NexusVPN.xcodeproj" ]; then
@@ -102,12 +114,18 @@ build_app() {
 
     cd "$PROJECT_DIR"
 
+    xcodebuild -list -project NexusVPN.xcodeproj >/dev/null
+
     xcodebuild -project NexusVPN.xcodeproj \
         -scheme NexusVPN \
         -configuration "$CONFIGURATION" \
+        -destination "platform=macOS" \
         -derivedDataPath "$BUILD_DIR/DerivedData" \
         CODE_SIGNING_ALLOWED=NO \
         CODE_SIGNING_REQUIRED=NO \
+        CODE_SIGN_IDENTITY= \
+        DEVELOPMENT_TEAM= \
+        CODE_SIGN_ENTITLEMENTS= \
         build
 
     APP_PATH=$(find "$BUILD_DIR/DerivedData" -name "NexusVPN.app" -type d | head -1)
@@ -120,6 +138,7 @@ build_app() {
     cp -R "$APP_PATH" "$BUILD_DIR/"
 }
 
+select_project_spec
 check_prereqs
 prepare_build_dir
 
