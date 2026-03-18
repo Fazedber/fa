@@ -68,7 +68,7 @@ Name: "{autostartup}\{#Brand} VPN"; Filename: "{app}\UI\{#ExeName}"; Tasks: star
 
 [Run]
 ; Install and start Windows service
-Filename: "sc.exe"; Parameters: "create {#BrandLower}VPN binPath= """"{app}\{#CoreName}"""" start= auto displayName= """{#Brand} VPN Service""" "; StatusMsg: "Installing service..."; Flags: runhidden
+Filename: "sc.exe"; Parameters: "create {#BrandLower}VPN binPath= ""{app}\{#CoreName}"" start= auto displayName= ""{#Brand} VPN Service"""; StatusMsg: "Installing service..."; Flags: runhidden
 Filename: "sc.exe"; Parameters: "description {#BrandLower}VPN ""NexusVPN Core Service - Manages VPN connections"""; StatusMsg: "Configuring service..."; Flags: runhidden
 Filename: "sc.exe"; Parameters: "start {#BrandLower}VPN"; StatusMsg: "Starting service..."; Flags: runhidden
 
