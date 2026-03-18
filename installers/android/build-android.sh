@@ -7,6 +7,7 @@ set -e
 BRAND="${BRAND:-nebula}"
 OUTPUT_DIR="${OUTPUT_DIR:-../dist/android}"
 BUILD_TYPE="${BUILD_TYPE:-release}"
+GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
 
 echo "========================================"
 echo "NexusVPN Android Build Script"
@@ -30,7 +31,7 @@ fi
 
 if ! command -v gomobile &> /dev/null; then
     echo -e "${YELLOW}Installing gomobile...${NC}"
-    go install golang.org/x/mobile/cmd/gomobile@latest
+    go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
     gomobile init
 fi
 

@@ -10,7 +10,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BRAND="${BRAND:-nebula}"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/dist/android}"
 BUILD_TYPE="${BUILD_TYPE:-debug}"
-GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20231127183840-76ac6878022f}"
+GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
 
 echo "========================================"
 echo "NexusVPN Android Build Script"

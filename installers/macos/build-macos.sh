@@ -7,6 +7,7 @@ set -e
 BRAND="${BRAND:-Nebula}"
 OUTPUT_DIR="${OUTPUT_DIR:-../dist/macos}"
 CONFIGURATION="${CONFIGURATION:-Release}"
+GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
 
 echo "========================================"
 echo "NexusVPN macOS Build Script"
@@ -35,7 +36,7 @@ fi
 
 if ! command -v gomobile &> /dev/null; then
     echo -e "${YELLOW}Installing gomobile...${NC}"
-    go install golang.org/x/mobile/cmd/gomobile@latest
+    go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
     gomobile init
 fi
 

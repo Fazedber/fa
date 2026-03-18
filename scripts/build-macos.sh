@@ -10,7 +10,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 BRAND="${BRAND:-Nebula}"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/dist/macos}"
 CONFIGURATION="${CONFIGURATION:-Release}"
-GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20231127183840-76ac6878022f}"
+GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
 
 echo "========================================"
 echo "NexusVPN macOS Build Script"
