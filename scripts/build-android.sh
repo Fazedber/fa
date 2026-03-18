@@ -181,8 +181,14 @@ build_apk() {
             echo -e "${RED}Failed to locate the built release APK${NC}"
             exit 1
         fi
-        cp "$APK_PATH" "$BUILD_DIR/${BRAND}-unsigned.apk"
-        echo -e "${YELLOW}  Note: APK is unsigned. Sign it before distribution.${NC}"
+        output_name="${BRAND}-unsigned.apk"
+        if [ -n "${ANDROID_KEYSTORE_PATH:-}" ] && [ -n "${ANDROID_KEY_ALIAS:-}" ] && [ -n "${ANDROID_KEYSTORE_PASSWORD:-}" ] && [ -n "${ANDROID_KEY_PASSWORD:-}" ]; then
+            output_name="${BRAND}-release.apk"
+            echo -e "${GREEN}  Release APK was signed with the configured keystore${NC}"
+        else
+            echo -e "${YELLOW}  Note: APK is unsigned. Configure ANDROID_KEYSTORE_* secrets for distribution.${NC}"
+        fi
+        cp "$APK_PATH" "$BUILD_DIR/${output_name}"
     else
         "$GRADLE_BIN" --no-daemon --stacktrace assemble${BRAND^}Debug
         APK_PATH="$(find app/build/outputs/apk -type f -name '*.apk' | sort | tail -n 1)"

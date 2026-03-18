@@ -32,9 +32,78 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $WindowsDistDir = Join-Path $RepoRoot "dist\windows"
 New-Item -ItemType Directory -Path $WindowsDistDir -Force | Out-Null
 
+function Get-SignToolPath {
+    $candidates = @(
+        Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue,
+        Get-ChildItem -Path "${env:ProgramFiles}\Windows Kits\10\bin" -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue
+    ) | Where-Object { $_ } | Sort-Object FullName -Descending
+
+    return $candidates | Select-Object -First 1 -ExpandProperty FullName
+}
+
+$CanCodeSign = -not [string]::IsNullOrWhiteSpace($env:WINDOWS_SIGN_CERT_PATH) -and `
+    -not [string]::IsNullOrWhiteSpace($env:WINDOWS_SIGN_CERT_PASSWORD)
+$SignTool = $null
+
+function Sign-Binary {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    if (-not $CanCodeSign) {
+        return
+    }
+
+    if (-not (Test-Path $Path)) {
+        throw "Cannot sign missing file: $Path"
+    }
+
+    & $SignTool sign `
+        /fd SHA256 `
+        /td SHA256 `
+        /tr http://timestamp.digicert.com `
+        /f $env:WINDOWS_SIGN_CERT_PATH `
+        /p $env:WINDOWS_SIGN_CERT_PASSWORD `
+        $Path
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Authenticode signing failed for $Path"
+    }
+}
+
+if ($CanCodeSign) {
+    $SignTool = Get-SignToolPath
+    if (-not $SignTool) {
+        throw "Windows code-signing certificate is configured, but signtool.exe was not found."
+    }
+
+    Write-Host "Found SignTool: $SignTool" -ForegroundColor Green
+}
+
 # Step 1: Build application
 Write-Host "`n[1/3] Building application..." -ForegroundColor Yellow
 & $PSScriptRoot\build-windows.ps1 -Brand $Brand
+
+# Verify build outputs
+Write-Host "`nVerifying build outputs..." -ForegroundColor Yellow
+$RequiredFiles = @(
+    (Join-Path $WindowsDistDir "$Brand\nexus-core.exe"),
+    (Join-Path $WindowsDistDir "$Brand\UI\$Brand.exe")
+)
+foreach ($file in $RequiredFiles) {
+    if (-not (Test-Path $file)) {
+        Write-Error "Required file not found: $file"
+        exit 1
+    }
+    Write-Host "  Found: $file" -ForegroundColor Green
+}
+
+if ($CanCodeSign) {
+    Write-Host "  Signing Windows application binaries..." -ForegroundColor Gray
+    Get-ChildItem -Path (Join-Path $WindowsDistDir $Brand) -Recurse -Filter *.exe -File |
+        ForEach-Object { Sign-Binary -Path $_.FullName }
+}
 
 # Step 2: Prepare assets
 Write-Host "`n[2/3] Preparing assets..." -ForegroundColor Yellow
@@ -90,6 +159,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $InstallerPath = Resolve-Path (Join-Path $WindowsDistDir "$Brand-VPN-$Version-Setup.exe")
+
+if ($CanCodeSign) {
+    Write-Host "  Signing installer..." -ForegroundColor Gray
+    Sign-Binary -Path $InstallerPath.Path
+}
 
 Write-Host "`n========================================" -ForegroundColor Green
 Write-Host "SUCCESS! Installer created:" -ForegroundColor Green
