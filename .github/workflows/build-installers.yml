@@ -121,6 +121,7 @@ jobs:
         run: |
           brew install create-dmg xcodegen
           go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
+          go install golang.org/x/mobile/cmd/gobind@${GOMOBILE_VERSION}
 
       - name: Build Nebula XCFramework
         shell: bash
@@ -250,7 +251,9 @@ jobs:
 
       - name: Install gomobile
         shell: bash
-        run: go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
+        run: |
+          go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
+          go install golang.org/x/mobile/cmd/gobind@${GOMOBILE_VERSION}
 
       - name: Build Android Go AAR
         shell: bash

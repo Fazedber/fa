@@ -14,15 +14,7 @@
     <PackageReference Include="Grpc.Core.Api" Version="2.76.0" />
     <PackageReference Include="Google.Protobuf" Version="3.34.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.76.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.76.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260209005" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\..\..\proto\api.proto" GrpcServices="Client" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(AppBrand)' == 'PepeWatafa'">
