@@ -19,6 +19,12 @@ jobs:
       with:
         go-version: ${{ env.GO_VERSION }}
         cache: true
+    - name: Resolve Go Modules
+      run: |
+        cd core
+        go get ./...
+        go mod tidy
+
     - name: Verify modules
       run: |
         cd core
@@ -34,6 +40,12 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
+    - name: Resolve Go Modules
+      run: |
+        cd core
+        go get ./...
+        go mod tidy
+
     - name: Build Core Daemon
       run: |
         cd core
@@ -58,6 +70,12 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
+    - name: Resolve Go Modules
+      run: |
+        cd core
+        go get ./...
+        go mod tidy
+
     - name: Install NDK and Gomobile
       run: |
         go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20231127183840-76ac6878022f
@@ -81,6 +99,12 @@ jobs:
       uses: actions/setup-go@v5
       with:
         go-version: ${{ env.GO_VERSION }}
+    - name: Resolve Go Modules
+      run: |
+        cd core
+        go get ./...
+        go mod tidy
+
     - name: Bind macOS Framework
       run: |
         go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20231127183840-76ac6878022f
@@ -92,3 +116,4 @@ jobs:
       with:
         name: macos-xcframework
         path: core/dist/Api.xcframework
+
