@@ -8,6 +8,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$NuGetConfig = Join-Path $RepoRoot "NuGet.Config"
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "NexusVPN Windows Build Script" -ForegroundColor Cyan
@@ -58,7 +60,11 @@ try {
 Write-Host "`n[2/3] Building Windows UI ($Brand)..." -ForegroundColor Yellow
 Push-Location (Join-Path $PSScriptRoot "..\apps\windows\NexusVPN")
 try {
-    dotnet restore
+    if (Test-Path $NuGetConfig) {
+        dotnet restore --configfile $NuGetConfig
+    } else {
+        dotnet restore
+    }
     dotnet publish -c $Configuration -p:AppBrand=$Brand --self-contained false -o "$BuildDir\UI"
     Write-Host "  UI built: $BuildDir\UI\$Brand.exe" -ForegroundColor Green
 } finally {

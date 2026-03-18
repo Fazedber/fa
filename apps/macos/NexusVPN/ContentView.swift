@@ -34,15 +34,30 @@ struct ContentView: View {
 
     func loadManager() {
         NETunnelProviderManager.loadAllFromPreferences { managers, error in
-            if let managers = managers, managers.count > 0 {
-                self.manager = managers[0]
-            } else {
+            if error != nil {
+                return
+            }
+
+            Task { @MainActor in
+                if let managers, let existingManager = managers.first {
+                    self.manager = existingManager
+                    return
+                }
+
                 let newManager = NETunnelProviderManager()
-                newManager.protocolConfiguration = NETunnelProviderProtocol()
-                newManager.protocolConfiguration?.serverAddress = "NexusVPN"
+                let tunnelProtocol = NETunnelProviderProtocol()
+                tunnelProtocol.serverAddress = "NexusVPN"
+                newManager.protocolConfiguration = tunnelProtocol
                 newManager.localizedDescription = "NexusVPN"
-                newManager.saveToPreferences { _ in
-                    self.manager = newManager
+
+                newManager.saveToPreferences { saveError in
+                    if saveError != nil {
+                        return
+                    }
+
+                    Task { @MainActor in
+                        self.manager = newManager
+                    }
                 }
             }
         }

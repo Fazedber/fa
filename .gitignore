@@ -17,6 +17,12 @@
 /captures
 .externalNativeBuild
 .cxx
+/dist/android/
+/dist/macos/
+/dist/windows/Nebula/
+/dist/windows/PepeWatafa/
+/apps/windows/NexusVPN/bin/
+/apps/windows/NexusVPN/obj/Release/
 
 # IDEs
 .vscode

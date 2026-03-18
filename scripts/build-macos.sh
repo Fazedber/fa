@@ -30,14 +30,18 @@ CI_PROJECT_SPEC="$PROJECT_DIR/project.ci.yml"
 PROJECT_FILE="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
 ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+USE_DIRECT_APP_BUNDLE=0
 
 select_project_spec() {
     if [ "${MACOS_SIGNED_BUILD:-0}" = "1" ] || [ -n "${DEVELOPER_ID:-}" ]; then
         ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+        USE_DIRECT_APP_BUNDLE=0
     elif [ -f "$CI_PROJECT_SPEC" ]; then
         ACTIVE_PROJECT_SPEC="$CI_PROJECT_SPEC"
+        USE_DIRECT_APP_BUNDLE=1
     else
         ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+        USE_DIRECT_APP_BUNDLE=0
     fi
 }
 
@@ -54,19 +58,24 @@ check_prereqs() {
         exit 1
     fi
 
-    if [ ! -f "$ACTIVE_PROJECT_SPEC" ]; then
-        echo -e "${RED}Missing XcodeGen spec: $ACTIVE_PROJECT_SPEC${NC}"
-        exit 1
-    fi
-
     if ! command -v gomobile >/dev/null 2>&1; then
         echo -e "${YELLOW}Installing gomobile...${NC}"
         go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
     fi
 
-    if ! command -v xcodegen >/dev/null 2>&1; then
-        echo -e "${YELLOW}Installing xcodegen...${NC}"
-        brew install xcodegen
+    if [ "$USE_DIRECT_APP_BUNDLE" = "0" ]; then
+        if [ ! -f "$ACTIVE_PROJECT_SPEC" ]; then
+            echo -e "${RED}Missing XcodeGen spec: $ACTIVE_PROJECT_SPEC${NC}"
+            exit 1
+        fi
+
+        if ! command -v xcodegen >/dev/null 2>&1; then
+            echo -e "${YELLOW}Installing xcodegen...${NC}"
+            brew install xcodegen
+        fi
+    elif ! command -v swiftc >/dev/null 2>&1; then
+        echo -e "${RED}swiftc is not installed${NC}"
+        exit 1
     fi
 
     echo -e "${GREEN}  All prerequisites met${NC}"
@@ -109,7 +118,7 @@ prepare_xcode_project() {
     fi
 }
 
-build_app() {
+build_app_with_xcodebuild() {
     echo -e "${YELLOW}[3/3] Building macOS App...${NC}"
 
     cd "$PROJECT_DIR"
@@ -138,6 +147,63 @@ build_app() {
     cp -R "$APP_PATH" "$BUILD_DIR/"
 }
 
+build_app_bundle_directly() {
+    echo -e "${YELLOW}[3/3] Building macOS App bundle directly...${NC}"
+
+    local sdk_path
+    local app_dir
+    local arm64_dir
+    local x86_64_dir
+    local sources
+
+    sdk_path="$(xcrun --sdk macosx --show-sdk-path)"
+    app_dir="$BUILD_DIR/NexusVPN.app"
+    arm64_dir="$BUILD_DIR/swiftc/arm64"
+    x86_64_dir="$BUILD_DIR/swiftc/x86_64"
+    sources=(
+        "$PROJECT_DIR/NexusVPN/NexusVPNApp.swift"
+        "$PROJECT_DIR/NexusVPN/ContentView.swift"
+    )
+
+    rm -rf "$app_dir" "$BUILD_DIR/swiftc"
+    mkdir -p "$app_dir/Contents/MacOS" "$app_dir/Contents/Resources" "$arm64_dir" "$x86_64_dir"
+
+    xcrun swiftc \
+        -sdk "$sdk_path" \
+        -target arm64-apple-macos14.0 \
+        -framework SwiftUI \
+        -framework AppKit \
+        -framework NetworkExtension \
+        "${sources[@]}" \
+        -o "$arm64_dir/NexusVPN"
+
+    xcrun swiftc \
+        -sdk "$sdk_path" \
+        -target x86_64-apple-macos14.0 \
+        -framework SwiftUI \
+        -framework AppKit \
+        -framework NetworkExtension \
+        "${sources[@]}" \
+        -o "$x86_64_dir/NexusVPN"
+
+    lipo -create \
+        "$arm64_dir/NexusVPN" \
+        "$x86_64_dir/NexusVPN" \
+        -output "$app_dir/Contents/MacOS/NexusVPN"
+
+    cp "$PROJECT_DIR/NexusVPN/Info.plist" "$app_dir/Contents/Info.plist"
+    chmod +x "$app_dir/Contents/MacOS/NexusVPN"
+}
+
+build_app() {
+    if [ "$USE_DIRECT_APP_BUNDLE" = "1" ]; then
+        build_app_bundle_directly
+    else
+        prepare_xcode_project
+        build_app_with_xcodebuild
+    fi
+}
+
 select_project_spec
 check_prereqs
 prepare_build_dir
@@ -147,12 +213,10 @@ case "$BUILD_PHASE" in
         build_xcframework
         ;;
     app)
-        prepare_xcode_project
         build_app
         ;;
     all)
         build_xcframework
-        prepare_xcode_project
         build_app
         ;;
     *)

@@ -148,6 +148,8 @@ build_aar() {
     go mod download
 
     gomobile bind -javapkg=api -target=android/arm64,android/arm \
+        -androidapi 26 \
+        -v \
         -o "$BUILD_DIR/core.aar" \
         -ldflags="-s -w" \
         ./mobileapi

@@ -251,12 +251,6 @@ jobs:
           echo "ANDROID_NDK_HOME=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_ROOT=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
           echo "NDK_HOME=$sdk_root/ndk/26.3.11579264" >> "$GITHUB_ENV"
-          echo "CC=$toolchain_bin/aarch64-linux-android21-clang" >> "$GITHUB_ENV"
-          echo "CXX=$toolchain_bin/aarch64-linux-android21-clang++" >> "$GITHUB_ENV"
-          echo "CC_FOR_TARGET=$toolchain_bin/aarch64-linux-android21-clang" >> "$GITHUB_ENV"
-          echo "CXX_FOR_TARGET=$toolchain_bin/aarch64-linux-android21-clang++" >> "$GITHUB_ENV"
-          echo "AR=$toolchain_bin/llvm-ar" >> "$GITHUB_ENV"
-          echo "$toolchain_bin" >> "$GITHUB_PATH"
 
       - name: Install gomobile
         shell: bash
