@@ -42,7 +42,9 @@ fi
 echo -e "${GREEN}  All prerequisites met${NC}"
 
 echo -e "${YELLOW}[1/4] Building macOS app...${NC}"
-bash "$SCRIPT_DIR/build-macos.sh"
+if [ "${SKIP_APP_BUILD:-0}" != "1" ]; then
+    bash "$SCRIPT_DIR/build-macos.sh"
+fi
 
 echo -e "${YELLOW}[2/4] Signing app...${NC}"
 APP_PATH="$OUTPUT_DIR/$BRAND/NexusVPN.app"

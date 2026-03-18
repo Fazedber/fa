@@ -123,22 +123,56 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
           gomobile init
 
-      - name: Build Nebula DMG
+      - name: Build Nebula XCFramework
         shell: bash
         env:
           BRAND: Nebula
           VERSION: ${{ env.VERSION }}
+          BUILD_PHASE: xcframework
+        run: bash ./scripts/build-macos.sh
+
+      - name: Build Nebula app
+        shell: bash
+        env:
+          BRAND: Nebula
+          VERSION: ${{ env.VERSION }}
+          BUILD_PHASE: app
+        run: bash ./scripts/build-macos.sh
+
+      - name: Package Nebula DMG
+        shell: bash
+        env:
+          BRAND: Nebula
+          VERSION: ${{ env.VERSION }}
+          SKIP_APP_BUILD: "1"
           DEVELOPER_ID: ${{ secrets.MACOS_DEVELOPER_ID }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: bash ./scripts/build-installer-macos.sh
 
-      - name: Build PepeWatafa DMG
+      - name: Build PepeWatafa XCFramework
         shell: bash
         env:
           BRAND: PepeWatafa
           VERSION: ${{ env.VERSION }}
+          BUILD_PHASE: xcframework
+        run: bash ./scripts/build-macos.sh
+
+      - name: Build PepeWatafa app
+        shell: bash
+        env:
+          BRAND: PepeWatafa
+          VERSION: ${{ env.VERSION }}
+          BUILD_PHASE: app
+        run: bash ./scripts/build-macos.sh
+
+      - name: Package PepeWatafa DMG
+        shell: bash
+        env:
+          BRAND: PepeWatafa
+          VERSION: ${{ env.VERSION }}
+          SKIP_APP_BUILD: "1"
           DEVELOPER_ID: ${{ secrets.MACOS_DEVELOPER_ID }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -221,11 +255,19 @@ jobs:
           go install golang.org/x/mobile/cmd/gomobile@${GOMOBILE_VERSION}
           gomobile init
 
+      - name: Build Android Go AAR
+        shell: bash
+        env:
+          BRAND: ${{ matrix.brand }}
+          BUILD_PHASE: aar
+        run: bash ./scripts/build-android.sh
+
       - name: Build APK
         shell: bash
         env:
           BRAND: ${{ matrix.brand }}
           BUILD_TYPE: ${{ env.BUILD_TYPE }}
+          BUILD_PHASE: apk
         run: bash ./scripts/build-android.sh
 
       - name: Upload APKs

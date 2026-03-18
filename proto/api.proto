@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package nexusvpn.api;
 option go_package = "nexusvpn/core/proto/api";
+option csharp_namespace = "Nexusvpn.Api";
 
 // PlatformBridge - единый контракт для вызова Go Core из C#/Swift/Kotlin
 service PlatformBridge {

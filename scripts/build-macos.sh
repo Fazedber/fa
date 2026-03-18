@@ -11,6 +11,7 @@ BRAND="${BRAND:-Nebula}"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/dist/macos}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
+BUILD_PHASE="${BUILD_PHASE:-all}"
 
 echo "========================================"
 echo "NexusVPN macOS Build Script"
@@ -28,74 +29,111 @@ PROJECT_SPEC="$PROJECT_DIR/project.yml"
 PROJECT_FILE="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
 
-echo -e "${YELLOW}Checking prerequisites...${NC}"
+check_prereqs() {
+    echo -e "${YELLOW}Checking prerequisites...${NC}"
 
-if ! command -v go >/dev/null 2>&1; then
-    echo -e "${RED}Go is not installed${NC}"
-    exit 1
-fi
+    if ! command -v go >/dev/null 2>&1; then
+        echo -e "${RED}Go is not installed${NC}"
+        exit 1
+    fi
 
-if ! command -v xcodebuild >/dev/null 2>&1; then
-    echo -e "${RED}Xcode is not installed${NC}"
-    exit 1
-fi
+    if ! command -v xcodebuild >/dev/null 2>&1; then
+        echo -e "${RED}Xcode is not installed${NC}"
+        exit 1
+    fi
 
-if [ ! -f "$PROJECT_SPEC" ]; then
-    echo -e "${RED}Missing XcodeGen spec: $PROJECT_SPEC${NC}"
-    exit 1
-fi
+    if [ ! -f "$PROJECT_SPEC" ]; then
+        echo -e "${RED}Missing XcodeGen spec: $PROJECT_SPEC${NC}"
+        exit 1
+    fi
 
-if ! command -v gomobile >/dev/null 2>&1; then
-    echo -e "${YELLOW}Installing gomobile...${NC}"
-    go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
-    gomobile init
-fi
+    if ! command -v gomobile >/dev/null 2>&1; then
+        echo -e "${YELLOW}Installing gomobile...${NC}"
+        go install golang.org/x/mobile/cmd/gomobile@"${GOMOBILE_VERSION}"
+        gomobile init
+    fi
 
-if ! command -v xcodegen >/dev/null 2>&1; then
-    echo -e "${YELLOW}Installing xcodegen...${NC}"
-    brew install xcodegen
-fi
+    if ! command -v xcodegen >/dev/null 2>&1; then
+        echo -e "${YELLOW}Installing xcodegen...${NC}"
+        brew install xcodegen
+    fi
 
-echo -e "${GREEN}  All prerequisites met${NC}"
+    echo -e "${GREEN}  All prerequisites met${NC}"
+}
 
-mkdir -p "$BUILD_DIR"
+prepare_build_dir() {
+    mkdir -p "$BUILD_DIR"
+}
 
-echo -e "${YELLOW}[1/3] Building Go Core (XCFramework)...${NC}"
-cd "$REPO_ROOT/core"
-go mod download
+build_xcframework() {
+    echo -e "${YELLOW}[1/3] Building Go Core (XCFramework)...${NC}"
+    cd "$REPO_ROOT/core"
+    go mod download
 
-gomobile bind -target=macos/arm64,macos/amd64 \
-    -o "$BUILD_DIR/Api.xcframework" \
-    -ldflags="-s -w" \
-    ./mobileapi
+    gomobile bind -target=macos/arm64,macos/amd64 \
+        -o "$BUILD_DIR/Api.xcframework" \
+        -ldflags="-s -w" \
+        ./mobileapi
 
-echo -e "${GREEN}  Core XCFramework built${NC}"
+    echo -e "${GREEN}  Core XCFramework built${NC}"
+}
 
-echo -e "${YELLOW}[2/3] Preparing Xcode project...${NC}"
-rm -rf "$PROJECT_DIR/NexusVPN/Api.xcframework" 2>/dev/null || true
-cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
-xcodegen generate --spec "$PROJECT_SPEC" --project "$PROJECT_DIR"
+prepare_xcode_project() {
+    if [ ! -d "$BUILD_DIR/Api.xcframework" ]; then
+        echo -e "${RED}Missing XCFramework: $BUILD_DIR/Api.xcframework${NC}"
+        exit 1
+    fi
 
-cd "$PROJECT_DIR"
+    echo -e "${YELLOW}[2/3] Preparing Xcode project...${NC}"
+    rm -rf "$PROJECT_DIR/NexusVPN/Api.xcframework" 2>/dev/null || true
+    cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
+    xcodegen generate --spec "$PROJECT_SPEC" --project "$PROJECT_DIR"
+}
 
-echo -e "${YELLOW}[3/3] Building macOS App...${NC}"
+build_app() {
+    echo -e "${YELLOW}[3/3] Building macOS App...${NC}"
 
-xcodebuild -project NexusVPN.xcodeproj \
-    -scheme NexusVPN \
-    -configuration "$CONFIGURATION" \
-    -derivedDataPath "$BUILD_DIR/DerivedData" \
-    CODE_SIGNING_ALLOWED=NO \
-    CODE_SIGNING_REQUIRED=NO \
-    build
+    cd "$PROJECT_DIR"
 
-APP_PATH=$(find "$BUILD_DIR/DerivedData" -name "NexusVPN.app" -type d | head -1)
+    xcodebuild -project NexusVPN.xcodeproj \
+        -scheme NexusVPN \
+        -configuration "$CONFIGURATION" \
+        -derivedDataPath "$BUILD_DIR/DerivedData" \
+        CODE_SIGNING_ALLOWED=NO \
+        CODE_SIGNING_REQUIRED=NO \
+        build
 
-if [ -z "$APP_PATH" ]; then
-    echo -e "${RED}Failed to find built app${NC}"
-    exit 1
-fi
+    APP_PATH=$(find "$BUILD_DIR/DerivedData" -name "NexusVPN.app" -type d | head -1)
 
-cp -R "$APP_PATH" "$BUILD_DIR/"
+    if [ -z "$APP_PATH" ]; then
+        echo -e "${RED}Failed to find built app${NC}"
+        exit 1
+    fi
+
+    cp -R "$APP_PATH" "$BUILD_DIR/"
+}
+
+check_prereqs
+prepare_build_dir
+
+case "$BUILD_PHASE" in
+    xcframework)
+        build_xcframework
+        ;;
+    app)
+        prepare_xcode_project
+        build_app
+        ;;
+    all)
+        build_xcframework
+        prepare_xcode_project
+        build_app
+        ;;
+    *)
+        echo -e "${RED}Unknown BUILD_PHASE: $BUILD_PHASE${NC}"
+        exit 1
+        ;;
+esac
 
 echo ""
 echo "========================================"
