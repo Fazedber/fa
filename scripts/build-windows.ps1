@@ -80,8 +80,6 @@ try {
         -c $Configuration `
         -r win-x64 `
         -p:AppBrand=$Brand `
-        -p:WindowsPackageType=None `
-        -p:WindowsAppSDKSelfContained=true `
         --self-contained true `
         -o "$BuildDir\UI"
     if ($LASTEXITCODE -ne 0) {

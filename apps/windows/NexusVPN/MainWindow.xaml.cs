@@ -1,77 +1,92 @@
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Threading;
-using Microsoft.UI;
+using System.Windows;
+using System.Windows.Media;
 
 namespace NexusVPN
 {
-    public sealed partial class MainWindow : Window
+    public partial class MainWindow : Window
     {
-        private CoreBridge _bridge;
-        private CancellationTokenSource _cts;
+        private readonly CoreBridge _bridge;
+        private readonly CancellationTokenSource _cts;
 
         public MainWindow()
         {
-            this.InitializeComponent();
-            
-            // Activate Windows 11 Mica Glassmorphism material for the App window
-            this.SystemBackdrop = new MicaBackdrop(); 
+            InitializeComponent();
 
 #if PEPE
-            this.Title = "PepeWatafa";
+            Title = "PepeWatafa VPN";
+            BrandTitle.Text = "PepeWatafa VPN";
 #else
-            this.Title = "Nebula";
+            Title = "Nebula VPN";
+            BrandTitle.Text = "Nebula VPN";
 #endif
 
-            // Initialize gRPC Bridge to Go Backend
             _bridge = new CoreBridge();
             _bridge.OnStateChanged += Bridge_OnStateChanged;
-            
             _cts = new CancellationTokenSource();
-            // Start listening in background to State Machine Stream
+
+            Loaded += MainWindow_Loaded;
+            Closed += MainWindow_Closed;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
             _ = _bridge.ListenToStateAsync(_cts.Token);
+        }
+
+        private void MainWindow_Closed(object? sender, EventArgs e)
+        {
+            _cts.Cancel();
+            _cts.Dispose();
         }
 
         private async void ConnectBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (BtnText.Text == "CONNECT")
+            ConnectBtn.IsEnabled = false;
+            try
             {
-                // UI does NOT implement VPN logic, it just sends the request to the Go Service
-                await _bridge.ConnectAsync("default-profile");
+                if (BtnText.Text == "CONNECT")
+                {
+                    await _bridge.ConnectAsync("default-profile");
+                }
+                else if (BtnText.Text == "DISCONNECT")
+                {
+                    await _bridge.DisconnectAsync();
+                }
             }
-            else
+            finally
             {
-                await _bridge.DisconnectAsync();
+                ConnectBtn.IsEnabled = true;
             }
         }
 
         private void Bridge_OnStateChanged(string newState)
         {
-            // Thread safely update UI (gRPC runs on background thread)
-            DispatcherQueue.TryEnqueue(() =>
+            Dispatcher.Invoke(() =>
             {
                 StatusText.Text = $"STATUS: {newState}";
-                
+
                 if (newState == "CONNECTED")
                 {
                     BtnText.Text = "DISCONNECT";
-                    // Transition to Neon Cyan glowing effect (Glassmorphism)
-                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(100, 0, 255, 204));
-                    StatusText.Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 0, 255, 204));
+                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(0x4D, 0x00, 0xD4, 0xAA));
+                    GlowBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(0x99, 0x00, 0xFF, 0xCC));
+                    StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0x63, 0xF0, 0xD1));
                 }
                 else if (newState == "CONNECTING" || newState == "RECONNECTING")
                 {
-                    BtnText.Text = "CONNECTING...";
-                    // Orange glow for trying to connect
-                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(100, 255, 170, 0));
+                    BtnText.Text = "CONNECTING";
+                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(0x4D, 0xFF, 0x8A, 0x00));
+                    GlowBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(0x99, 0xFF, 0xB3, 0x33));
+                    StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xC9, 0x66));
                 }
                 else
                 {
                     BtnText.Text = "CONNECT";
-                    // Reset to unlit state
-                    GlowBorder.Background = new SolidColorBrush(ColorHelper.FromArgb(50, 68, 68, 68));
-                    StatusText.Foreground = new SolidColorBrush(Colors.DarkGray);
+                    GlowBorder.Background = new SolidColorBrush(Color.FromArgb(0x20, 0x35, 0x44, 0x66));
+                    GlowBorder.BorderBrush = new SolidColorBrush(Color.FromArgb(0x40, 0xA7, 0xE5, 0xFF));
+                    StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0xA0, 0xAB, 0xB9));
                 }
             });
         }
