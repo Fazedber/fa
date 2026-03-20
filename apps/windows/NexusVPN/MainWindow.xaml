@@ -3,88 +3,383 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Nebula VPN"
-    Width="460"
-    Height="620"
+    Width="1520"
+    Height="920"
+    MinWidth="1240"
+    MinHeight="780"
     WindowStartupLocation="CenterScreen"
-    Background="#0D1017">
+    Background="#ECE7DF">
 
-    <Grid Margin="28">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <Style x:Key="MetricLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Bahnschrift Light" />
+            <Setter Property="Foreground" Value="#8B857C" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+        </Style>
 
-        <StackPanel>
-            <TextBlock
-                x:Name="BrandTitle"
-                Text="Nebula VPN"
-                FontSize="30"
-                FontWeight="SemiBold"
-                Foreground="White" />
-            <TextBlock
-                Margin="0,8,0,0"
-                Text="Desktop tunnel controller"
-                FontSize="14"
-                Foreground="#99A7BF" />
-        </StackPanel>
+        <Style x:Key="MetricValueStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Bahnschrift SemiLight" />
+            <Setter Property="Foreground" Value="#0F1012" />
+            <Setter Property="FontSize" Value="22" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+        </Style>
 
-        <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Style x:Key="PetalStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Fill" Value="#F5F1EA" />
+            <Setter Property="Opacity" Value="0.9" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        </Style>
+    </Window.Resources>
+
+    <Grid ClipToBounds="True">
+        <Grid.Background>
+            <RadialGradientBrush RadiusX="0.9" RadiusY="0.9">
+                <GradientStop Color="#F6F3ED" Offset="0" />
+                <GradientStop Color="#E6E0D5" Offset="1" />
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <Polygon
+            Points="0,0 1520,0 1520,370 0,690"
+            Fill="#050505"
+            Stretch="Fill" />
+        <Polygon
+            Points="0,690 1520,370 1520,920 0,920"
+            Fill="#F3EEE6"
+            Stretch="Fill" />
+
+        <Canvas IsHitTestVisible="False">
+            <Path
+                Data="M-40,240 C120,160 240,150 380,215 C520,280 700,258 920,178"
+                Stroke="#FAF7F0"
+                StrokeThickness="10"
+                StrokeStartLineCap="Round"
+                StrokeEndLineCap="Round"
+                Opacity="0.55" />
+            <Path
+                Data="M980,700 C1110,620 1210,545 1335,478 C1425,430 1492,406 1565,392"
+                Stroke="#1E1A19"
+                StrokeThickness="9"
+                StrokeStartLineCap="Round"
+                StrokeEndLineCap="Round"
+                Opacity="0.55" />
+
+            <Path
+                Data="M30,318 C145,284 228,286 344,344"
+                Stroke="#F0E8DD"
+                StrokeThickness="3"
+                StrokeDashArray="2 8"
+                Opacity="0.45" />
+            <Path
+                Data="M1184,516 C1296,560 1384,624 1512,768"
+                Stroke="#2C2A28"
+                StrokeThickness="3"
+                StrokeDashArray="2 8"
+                Opacity="0.35" />
+
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="92" Canvas.Top="177">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-26" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="110" Canvas.Top="182">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="18" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="96" Canvas.Top="196">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="74" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="124" Canvas.Top="203">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-52" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="242" Canvas.Top="216">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-12" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="262" Canvas.Top="223">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="30" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="248" Canvas.Top="240">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="84" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="278" Canvas.Top="238">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-44" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="1232" Canvas.Top="534" Fill="#171515">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-26" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="1250" Canvas.Top="538" Fill="#171515">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="16" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="1236" Canvas.Top="554" Fill="#171515">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="76" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Style="{StaticResource PetalStyle}" Canvas.Left="1264" Canvas.Top="560" Fill="#171515">
+                <Ellipse.RenderTransform>
+                    <RotateTransform Angle="-54" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Canvas>
+
+        <Grid Margin="56">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.3*" />
+                <ColumnDefinition Width="1.35*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
             <Border
-                x:Name="GlowBorder"
-                Width="220"
-                Height="220"
-                CornerRadius="110"
-                Background="#20354466"
-                BorderBrush="#40A7E5FF"
-                BorderThickness="1"
-                Padding="18">
-                <Button
-                    x:Name="ConnectBtn"
-                    Click="ConnectBtn_Click"
-                    Cursor="Hand"
-                    Background="#0B1623"
-                    Foreground="White"
-                    BorderBrush="#55A7E5FF"
-                    BorderThickness="1"
-                    FontSize="24"
-                    FontWeight="Bold">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="92">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                            </Border>
-                        </ControlTemplate>
-                    </Button.Template>
-                    <TextBlock x:Name="BtnText" Text="CONNECT" />
-                </Button>
+                Width="52"
+                Height="52"
+                CornerRadius="26"
+                Background="#121212"
+                BorderBrush="#685936"
+                BorderThickness="1.5"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left">
+                <TextBlock
+                    Text="&#x265B;"
+                    Foreground="#D5B96F"
+                    FontSize="25"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontFamily="Segoe UI Symbol" />
             </Border>
 
-            <TextBlock
-                x:Name="StatusText"
-                Margin="0,28,0,0"
-                Text="STATUS: DISCONNECTED"
-                FontSize="16"
-                Foreground="#A0ABB9"
-                HorizontalAlignment="Center" />
-        </StackPanel>
+            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,20,32,0">
+                <TextBlock
+                    x:Name="BrandTitle"
+                    Text="Nebula VPN"
+                    FontFamily="Yu Mincho"
+                    FontSize="34"
+                    Foreground="#F3EEE7"
+                    Margin="0,0,0,10" />
 
-        <Border
-            Grid.Row="2"
-            CornerRadius="16"
-            Padding="14"
-            Background="#151C28"
-            BorderBrush="#223044"
-            BorderThickness="1">
+                <TextBlock
+                    Text="D  E  A  T  H"
+                    FontFamily="Bahnschrift Light"
+                    FontSize="54"
+                    Foreground="#F6F1E8"
+                    Margin="0,0,0,16" />
+
+                <TextBlock
+                    Text="&#x6B7B; &#x751F;"
+                    FontFamily="Yu Mincho"
+                    FontSize="74"
+                    Foreground="#F3ECE2"
+                    Margin="0,0,0,18" />
+
+                <TextBlock
+                    Text="L  I  F  E"
+                    FontFamily="Bahnschrift Light"
+                    FontSize="54"
+                    Foreground="#111011"
+                    Margin="0,0,0,32" />
+
+                <TextBlock
+                    Width="620"
+                    Text="Monochrome ritual interface. Black current above, pale silence below. The control point stays centered between death and life instead of looking like a generic VPN dashboard."
+                    FontFamily="Bahnschrift Light"
+                    FontSize="18"
+                    Foreground="#BCB4A8"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+
+            <Grid Grid.Column="1" Grid.RowSpan="3" Margin="16,6,0,0">
+                <Ellipse
+                    Width="690"
+                    Height="690"
+                    Fill="#0F0F10"
+                    Opacity="0.08"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+
+                <Grid
+                    Width="640"
+                    Height="640"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <Ellipse Fill="#080808" />
+                    <Ellipse Margin="28" Fill="#F2ECE2" />
+                    <Path
+                        Data="M320,32 C470,36 590,152 606,302 C620,440 530,568 392,614 C450,522 460,430 430,350 C396,260 338,200 236,128 C274,70 272,44 320,32Z"
+                        Fill="#0B0B0C"
+                        Opacity="0.98" />
+                    <Path
+                        Data="M258,148 C196,176 160,232 154,300 C146,382 190,464 278,520 C228,438 214,358 230,292 C246,224 292,184 360,160 C328,142 292,138 258,148Z"
+                        Fill="#F1ECE4"
+                        Opacity="0.92" />
+                    <TextBlock
+                        x:Name="HeroGlyph"
+                        Text="&#x9F8D;"
+                        FontFamily="Yu Mincho"
+                        FontSize="248"
+                        FontWeight="Bold"
+                        Foreground="#121212"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,-24,0,0" />
+
+                    <Ellipse
+                        x:Name="GlowBorder"
+                        Width="242"
+                        Height="242"
+                        Stroke="#D1B168"
+                        StrokeThickness="2.5"
+                        Fill="#0A0A0D"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,228,0,0" />
+
+                    <Button
+                        x:Name="ConnectBtn"
+                        Width="196"
+                        Height="196"
+                        Click="ConnectBtn_Click"
+                        Cursor="Hand"
+                        Background="#0A0A0D"
+                        BorderBrush="#D1B168"
+                        BorderThickness="2"
+                        Foreground="#F4F0EA"
+                        FontFamily="Bahnschrift SemiBold"
+                        FontSize="28"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="0,228,0,0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="98">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock
+                                x:Name="BtnText"
+                                Text="CONNECT"
+                                FontFamily="Bahnschrift SemiBold"
+                                FontSize="28"
+                                HorizontalAlignment="Center" />
+                            <TextBlock
+                                Text="RITUAL GATE"
+                                FontFamily="Bahnschrift Light"
+                                FontSize="12"
+                                Margin="0,6,0,0"
+                                Foreground="#9A927F"
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+
+                <Border
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Width="392"
+                    Margin="0,0,0,14"
+                    Padding="26"
+                    CornerRadius="24"
+                    Background="#E9E3D8"
+                    BorderBrush="#C9C2B6"
+                    BorderThickness="1.2">
+                    <StackPanel>
+                        <TextBlock
+                            Text="CONTROL CHAMBER"
+                            FontFamily="Bahnschrift SemiBold"
+                            FontSize="18"
+                            Foreground="#111012" />
+                        <TextBlock
+                            Text="Primary Windows draft for approval"
+                            FontFamily="Bahnschrift Light"
+                            FontSize="14"
+                            Margin="0,6,0,18"
+                            Foreground="#817A71" />
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="MODE" Style="{StaticResource MetricLabelStyle}" />
+                                <TextBlock x:Name="ModeText" Text="RITUAL" Style="{StaticResource MetricValueStyle}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="ROUTE" Style="{StaticResource MetricLabelStyle}" />
+                                <TextBlock x:Name="RouteText" Text="TOKYO-01" Style="{StaticResource MetricValueStyle}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Margin="0,0,0,18">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="PROTOCOL" Style="{StaticResource MetricLabelStyle}" />
+                                <TextBlock x:Name="ProtocolText" Text="VLESS" Style="{StaticResource MetricValueStyle}" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="STATE" Style="{StaticResource MetricLabelStyle}" />
+                                <TextBlock x:Name="StateGlyphText" Text="DORMANT" Style="{StaticResource MetricValueStyle}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Border
+                            CornerRadius="16"
+                            Padding="18"
+                            Background="#121214">
+                            <TextBlock
+                                x:Name="StatusText"
+                                Text="STATUS: DISCONNECTED"
+                                FontFamily="Bahnschrift SemiLight"
+                                FontSize="18"
+                                Foreground="#F2EEE7"
+                                TextWrapping="Wrap" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
             <TextBlock
-                Text="If the daemon is not running, the UI will stay disconnected until the service starts."
-                TextWrapping="Wrap"
-                Foreground="#8D9AAF"
-                FontSize="13" />
-        </Border>
+                Grid.Row="2"
+                Margin="0,28,0,0"
+                Text="DRAGON CURRENT  /  CHERRY VEIL  /  BLACK-AND-IVORY CONTROL"
+                FontFamily="Bahnschrift Light"
+                FontSize="14"
+                Foreground="#9D968B"
+                VerticalAlignment="Bottom" />
+        </Grid>
     </Grid>
 </Window>
