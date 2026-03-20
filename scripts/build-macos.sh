@@ -84,6 +84,27 @@ run_with_log() {
     fi
 }
 
+downgrade_project_format_for_xcode15() {
+    local pbxproj_path
+
+    pbxproj_path="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
+    if [ ! -f "$pbxproj_path" ]; then
+        return
+    fi
+
+    python3 - "$pbxproj_path" <<'PY'
+from pathlib import Path
+import sys
+
+path = Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+updated = text.replace("objectVersion = 77;", "objectVersion = 60;")
+updated = updated.replace("preferredProjectObjectVersion = 77;", "preferredProjectObjectVersion = 60;")
+if updated != text:
+    path.write_text(updated, encoding="utf-8")
+PY
+}
+
 check_prereqs() {
     echo -e "${YELLOW}Checking prerequisites...${NC}"
 
@@ -148,6 +169,7 @@ prepare_xcode_project() {
             "$BUILD_DIR/xcodegen.log" \
             xcodegen generate --spec "$ACTIVE_PROJECT_SPEC"
     )
+    downgrade_project_format_for_xcode15
 
     if [ ! -d "$PROJECT_DIR/NexusVPN.xcodeproj" ]; then
         echo -e "${RED}Failed to generate Xcode project at $PROJECT_DIR/NexusVPN.xcodeproj${NC}"

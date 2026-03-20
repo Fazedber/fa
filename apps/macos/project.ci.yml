@@ -1,6 +1,7 @@
 name: NexusVPN
 options:
   minimumXcodeGenVersion: 2.44.0
+  xcodeVersion: "15.4"
   createIntermediateGroups: true
 
 settings:
