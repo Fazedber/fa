@@ -4,6 +4,7 @@
 param(
     [string]$Configuration = "Release",
     [string]$Brand = "Nebula",
+    [string]$Version = "1.0.0",
     [string]$OutputDir = "..\dist\windows"
 )
 
@@ -15,6 +16,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "NexusVPN Windows Build Script" -ForegroundColor Cyan
 Write-Host "Configuration: $Configuration" -ForegroundColor Cyan
 Write-Host "Brand: $Brand" -ForegroundColor Cyan
+Write-Host "Version: $Version" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # Check prerequisites
@@ -43,6 +45,12 @@ if (-not $OutputPath) {
 
 $BuildDir = Join-Path $OutputPath $Brand
 New-Item -ItemType Directory -Path $BuildDir -Force | Out-Null
+
+$BrandLower = $Brand.ToLowerInvariant()
+$IconSource = Join-Path $RepoRoot "assets\$BrandLower.ico"
+if (-not (Test-Path $IconSource)) {
+    throw "Required icon asset was not found: $IconSource"
+}
 
 # Build Go Core
 Write-Host "`n[1/3] Building Go Core..." -ForegroundColor Yellow
@@ -80,11 +88,16 @@ try {
         -c $Configuration `
         -r win-x64 `
         -p:AppBrand=$Brand `
+        -p:Version=$Version `
+        -p:FileVersion=$Version `
+        -p:InformationalVersion=$Version `
         --self-contained true `
         -o "$BuildDir\UI"
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet publish failed"
     }
+
+    Copy-Item -Path $IconSource -Destination "$BuildDir\UI\app.ico" -Force
     Write-Host "  UI built: $BuildDir\UI\$Brand.exe" -ForegroundColor Green
 } finally {
     Pop-Location

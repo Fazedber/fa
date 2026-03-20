@@ -83,13 +83,14 @@ if ($CanCodeSign) {
 
 # Step 1: Build application
 Write-Host "`n[1/3] Building application..." -ForegroundColor Yellow
-& $PSScriptRoot\build-windows.ps1 -Brand $Brand
+& $PSScriptRoot\build-windows.ps1 -Brand $Brand -Version $Version
 
 # Verify build outputs
 Write-Host "`nVerifying build outputs..." -ForegroundColor Yellow
 $RequiredFiles = @(
     (Join-Path $WindowsDistDir "$Brand\nexus-core.exe"),
-    (Join-Path $WindowsDistDir "$Brand\UI\$Brand.exe")
+    (Join-Path $WindowsDistDir "$Brand\UI\$Brand.exe"),
+    (Join-Path $WindowsDistDir "$Brand\UI\app.ico")
 )
 foreach ($file in $RequiredFiles) {
     if (-not (Test-Path $file)) {
@@ -112,12 +113,9 @@ if (-not (Test-Path $AssetsDir)) {
     New-Item -ItemType Directory -Path $AssetsDir -Force | Out-Null
 }
 
-# Create simple icon if not exists
-$IconPath = Join-Path $AssetsDir "icon.ico"
+$IconPath = Join-Path $AssetsDir ($Brand.ToLowerInvariant() + ".ico")
 if (-not (Test-Path $IconPath)) {
-    Write-Host "  Creating default icon..." -ForegroundColor Gray
-    # Use PowerShell to create a simple icon (or copy from resources)
-    # For now, we'll skip icon creation
+    throw "Brand icon asset was not found: $IconPath"
 }
 
 # Step 3: Build installer
@@ -142,12 +140,17 @@ if (-not $UiExe) {
 }
 
 $exeName = $UiExe.Name
+$appId = switch ($Brand.ToLowerInvariant()) {
+    "pepewatafa" { "{{C0192F5D-6D31-4D77-B1E1-55E8C89806EA}" }
+    default { "{{B4A4C4E4-5F4A-4C4E-8B4A-4C4E4F4A4C4E}" }
+}
 
 & $ISCC `
     "/DBrand=$Brand" `
     "/DBrandLower=$brandLower" `
     "/DVersion=$Version" `
     "/DExeName=$exeName" `
+    "/DAppId=$appId" `
     /Q `
     "/O$WindowsDistDir" `
     /F"$Brand-VPN-$Version-Setup" `

@@ -25,6 +25,49 @@
             <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
         </Style>
 
+        <Style x:Key="PanelCaptionStyle" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Bahnschrift Light" />
+            <Setter Property="Foreground" Value="#8B857C" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+        </Style>
+
+        <Style x:Key="PanelButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#F4EFE8" />
+            <Setter Property="Background" Value="#121214" />
+            <Setter Property="BorderBrush" Value="#D1B168" />
+            <Setter Property="BorderThickness" Value="1.4" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="FontFamily" Value="Bahnschrift SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PanelTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Foreground" Value="#F4EFE8" />
+            <Setter Property="Background" Value="#111214" />
+            <Setter Property="BorderBrush" Value="#2B2B2D" />
+            <Setter Property="BorderThickness" Value="1.2" />
+            <Setter Property="Padding" Value="14" />
+            <Setter Property="FontFamily" Value="Bahnschrift Light" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
         <Style x:Key="PetalStyle" TargetType="Ellipse">
             <Setter Property="Width" Value="16" />
             <Setter Property="Height" Value="10" />
@@ -306,7 +349,7 @@
                     Grid.Row="2"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
-                    Width="392"
+                    Width="420"
                     Margin="0,0,0,14"
                     Padding="26"
                     CornerRadius="24"
@@ -320,7 +363,7 @@
                             FontSize="18"
                             Foreground="#111012" />
                         <TextBlock
-                            Text="Primary Windows draft for approval"
+                            Text="Import a proxy link, bind it to the ritual shell, then let GitHub Releases feed updates into the installed client."
                             FontFamily="Bahnschrift Light"
                             FontSize="14"
                             Margin="0,6,0,18"
@@ -359,6 +402,7 @@
                         <Border
                             CornerRadius="16"
                             Padding="18"
+                            Margin="0,0,0,18"
                             Background="#121214">
                             <TextBlock
                                 x:Name="StatusText"
@@ -367,6 +411,66 @@
                                 FontSize="18"
                                 Foreground="#F2EEE7"
                                 TextWrapping="Wrap" />
+                        </Border>
+
+                        <TextBlock Text="PROXY LINK" Style="{StaticResource PanelCaptionStyle}" />
+                        <TextBox
+                            x:Name="ProfileInputBox"
+                            Height="92"
+                            Margin="0,8,0,10"
+                            Style="{StaticResource PanelTextBoxStyle}" />
+
+                        <UniformGrid Columns="2" Margin="0,0,0,10">
+                            <Button
+                                x:Name="PasteBtn"
+                                Margin="0,0,8,0"
+                                Click="PasteBtn_Click"
+                                Style="{StaticResource PanelButtonStyle}"
+                                Content="PASTE" />
+                            <Button
+                                x:Name="ImportBtn"
+                                Margin="8,0,0,0"
+                                Click="ImportBtn_Click"
+                                Style="{StaticResource PanelButtonStyle}"
+                                Content="IMPORT LINK" />
+                        </UniformGrid>
+
+                        <TextBlock Text="BOUND PROFILE" Style="{StaticResource PanelCaptionStyle}" />
+                        <TextBlock
+                            x:Name="ProfileSummaryText"
+                            Text="No proxy link imported yet."
+                            FontFamily="Bahnschrift SemiLight"
+                            FontSize="15"
+                            Margin="0,8,0,18"
+                            Foreground="#171618"
+                            TextWrapping="Wrap" />
+
+                        <Border
+                            CornerRadius="16"
+                            Padding="18"
+                            Background="#F3EEE6"
+                            BorderBrush="#C9C2B6"
+                            BorderThickness="1.2">
+                            <StackPanel>
+                                <TextBlock
+                                    Text="UPDATE CHANNEL"
+                                    FontFamily="Bahnschrift SemiBold"
+                                    FontSize="16"
+                                    Foreground="#111012" />
+                                <TextBlock
+                                    x:Name="UpdateStatusText"
+                                    Text="UPDATE CHANNEL: CHECKING RELEASE FEED"
+                                    FontFamily="Bahnschrift Light"
+                                    FontSize="13"
+                                    Margin="0,8,0,12"
+                                    Foreground="#635D56"
+                                    TextWrapping="Wrap" />
+                                <Button
+                                    x:Name="UpdateBtn"
+                                    Click="UpdateBtn_Click"
+                                    Style="{StaticResource PanelButtonStyle}"
+                                    Content="CHECK UPDATES" />
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </Border>
