@@ -29,18 +29,58 @@ NC='\033[0m'
 
 PROJECT_DIR="$REPO_ROOT/apps/macos"
 PROJECT_SPEC="$PROJECT_DIR/project.yml"
-CI_PROJECT_SPEC="$PROJECT_DIR/project.ci.yml"
 PROJECT_FILE="$PROJECT_DIR/NexusVPN.xcodeproj/project.pbxproj"
 BUILD_DIR="$OUTPUT_DIR/$BRAND"
 ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
 
 select_project_spec() {
-    if [ "${MACOS_SIGNED_BUILD:-0}" = "1" ] || [ -n "${DEVELOPER_ID:-}" ]; then
-        ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
-    elif [ -f "$CI_PROJECT_SPEC" ]; then
-        ACTIVE_PROJECT_SPEC="$CI_PROJECT_SPEC"
+    ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+}
+
+escape_workflow_message() {
+    local value
+    value="$1"
+    value="${value//'%'/'%25'}"
+    value="${value//$'\r'/'%0D'}"
+    value="${value//$'\n'/'%0A'}"
+    printf '%s' "$value"
+}
+
+emit_failure_annotation() {
+    local title
+    local log_file
+    local excerpt
+
+    title="$1"
+    log_file="$2"
+
+    if [ -f "$log_file" ]; then
+        excerpt="$(tail -n 40 "$log_file")"
     else
-        ACTIVE_PROJECT_SPEC="$PROJECT_SPEC"
+        excerpt="No log output was captured."
+    fi
+
+    echo "::error title=$(escape_workflow_message "$title")::$(escape_workflow_message "$excerpt")"
+}
+
+run_with_log() {
+    local title
+    local log_file
+
+    title="$1"
+    log_file="$2"
+    shift 2
+
+    mkdir -p "$(dirname "$log_file")"
+
+    set +e
+    "$@" 2>&1 | tee "$log_file"
+    local status=${PIPESTATUS[0]}
+    set -e
+
+    if [ "$status" -ne 0 ]; then
+        emit_failure_annotation "$title" "$log_file"
+        return "$status"
     fi
 }
 
@@ -103,7 +143,10 @@ prepare_xcode_project() {
     cp -R "$BUILD_DIR/Api.xcframework" "$PROJECT_DIR/NexusVPN/"
     (
         cd "$PROJECT_DIR"
-        xcodegen generate --spec "$ACTIVE_PROJECT_SPEC"
+        run_with_log \
+            "XcodeGen failed for $BRAND" \
+            "$BUILD_DIR/xcodegen.log" \
+            xcodegen generate --spec "$ACTIVE_PROJECT_SPEC"
     )
 
     if [ ! -d "$PROJECT_DIR/NexusVPN.xcodeproj" ]; then
@@ -117,9 +160,15 @@ build_app_with_xcodebuild() {
 
     cd "$PROJECT_DIR"
 
-    xcodebuild -list -project NexusVPN.xcodeproj >/dev/null
+    run_with_log \
+        "xcodebuild -list failed for $BRAND" \
+        "$BUILD_DIR/xcodebuild-list.log" \
+        xcodebuild -list -project NexusVPN.xcodeproj
 
-    xcodebuild -project NexusVPN.xcodeproj \
+    run_with_log \
+        "xcodebuild build failed for $BRAND" \
+        "$BUILD_DIR/xcodebuild.log" \
+        xcodebuild -project NexusVPN.xcodeproj \
         -scheme NexusVPN \
         -configuration "$CONFIGURATION" \
         -destination "platform=macOS" \

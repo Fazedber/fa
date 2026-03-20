@@ -235,6 +235,14 @@ jobs:
           path: dist/macos/*.dmg
           if-no-files-found: error
 
+      - name: Upload macOS build logs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: macos-build-logs
+          path: dist/macos/**/*.log
+          if-no-files-found: ignore
+
       - name: Clean up Apple signing keychain
         if: always()
         shell: bash
