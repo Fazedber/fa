@@ -57,11 +57,10 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
             }
             
             // 4. Trigger the actual Sing-box runtime inside the Extension Sandbox
-            var connectErr: NSError?
-            self.coreBridge?.connect(profileId, error: &connectErr)
-            
-            if let connectErr = connectErr {
-                completionHandler(connectErr)
+            do {
+                try self.coreBridge?.connect(profileId)
+            } catch {
+                completionHandler(error)
                 return
             }
             
@@ -71,8 +70,11 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
 
     override func stopTunnel(with reason: NEProviderStopReason, completionHandler: @escaping () -> Void) {
         // Deterministic shutdown triggered from macOS System/Sandbox
-        var stopErr: NSError?
-        self.coreBridge?.disconnect(&stopErr)
+        do {
+            try self.coreBridge?.disconnect()
+        } catch {
+            NSLog("Failed to stop tunnel cleanly: \(error)")
+        }
         
         self.coreBridge = nil
         completionHandler()
