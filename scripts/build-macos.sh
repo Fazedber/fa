@@ -9,6 +9,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 BRAND="${BRAND:-Nebula}"
 VERSION="${VERSION:-1.0.0}"
+BUILD_NUMBER="${BUILD_NUMBER:-${GITHUB_RUN_NUMBER:-1}}"
 OUTPUT_DIR="${OUTPUT_DIR:-$REPO_ROOT/dist/macos}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 GOMOBILE_VERSION="${GOMOBILE_VERSION:-v0.0.0-20240716161057-1ad2df20a8b6}"
@@ -17,6 +18,7 @@ BUILD_PHASE="${BUILD_PHASE:-all}"
 echo "========================================"
 echo "NexusVPN macOS Build Script"
 echo "Brand: $BRAND"
+echo "Version: $VERSION ($BUILD_NUMBER)"
 echo "Configuration: $CONFIGURATION"
 echo "========================================"
 
@@ -123,7 +125,7 @@ build_app_with_xcodebuild() {
         -destination "platform=macOS" \
         -derivedDataPath "$BUILD_DIR/DerivedData" \
         MARKETING_VERSION="$VERSION" \
-        CURRENT_PROJECT_VERSION="$VERSION" \
+        CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
         CODE_SIGNING_ALLOWED=NO \
         CODE_SIGNING_REQUIRED=NO \
         CODE_SIGN_IDENTITY= \
