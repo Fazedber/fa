@@ -50,12 +50,24 @@ emit_failure_annotation() {
     local title
     local log_file
     local excerpt
+    local error_lines
+    local note_lines
 
     title="$1"
     log_file="$2"
 
     if [ -f "$log_file" ]; then
-        excerpt="$(tail -n 40 "$log_file")"
+        error_lines="$(grep -E '(^|[^[:alpha:]])error:' "$log_file" | tail -n 12 || true)"
+        note_lines="$(grep -E '(^|[^[:alpha:]])note:' "$log_file" | tail -n 8 || true)"
+
+        if [ -n "$error_lines" ]; then
+            excerpt="$error_lines"
+            if [ -n "$note_lines" ]; then
+                excerpt="$excerpt"$'\n'"$note_lines"
+            fi
+        else
+            excerpt="$(tail -n 20 "$log_file")"
+        fi
     else
         excerpt="No log output was captured."
     fi
