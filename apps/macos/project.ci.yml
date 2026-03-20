@@ -25,6 +25,8 @@ targets:
     deploymentTarget: "14.0"
     settings:
       base:
+        PRODUCT_NAME: NexusVPN
+        PRODUCT_MODULE_NAME: NexusVPN
         PRODUCT_BUNDLE_IDENTIFIER: com.nexusvpn.app
     sources:
       - path: NexusVPN
@@ -75,6 +77,8 @@ targets:
         codeSign: false
     settings:
       base:
+        PRODUCT_NAME: NexusVPNExtension
+        PRODUCT_MODULE_NAME: NexusVPNExtension
         PRODUCT_BUNDLE_IDENTIFIER: com.nexusvpn.app.extension
         INFOPLIST_KEY_CFBundleDisplayName: NexusVPNExtension
     info:
