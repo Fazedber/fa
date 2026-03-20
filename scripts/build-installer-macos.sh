@@ -49,6 +49,27 @@ fi
 echo -e "${YELLOW}[2/4] Signing app...${NC}"
 APP_PATH="$OUTPUT_DIR/$BRAND/NexusVPN.app"
 
+if [ ! -d "$APP_PATH" ]; then
+    echo -e "${RED}Missing app bundle: $APP_PATH${NC}"
+    exit 1
+fi
+
+if [ ! -d "$APP_PATH/Contents/PlugIns/NexusVPNExtension.appex" ]; then
+    echo -e "${RED}Missing packet tunnel extension inside bundle${NC}"
+    exit 1
+fi
+
+if [ ! -f "$APP_PATH/Contents/Resources/AppIcon.icns" ]; then
+    echo -e "${RED}Missing app icon inside bundle${NC}"
+    exit 1
+fi
+
+APP_SIZE_KB="$(du -sk "$APP_PATH" | cut -f1)"
+if [ "${APP_SIZE_KB:-0}" -lt 512 ]; then
+    echo -e "${RED}App bundle is unexpectedly small (${APP_SIZE_KB} KB)${NC}"
+    exit 1
+fi
+
 if [ -n "${DEVELOPER_ID:-}" ]; then
     echo "  Signing with Developer ID: $DEVELOPER_ID"
     codesign --force --deep --sign "Developer ID Application: $DEVELOPER_ID" "$APP_PATH"

@@ -33,6 +33,14 @@ targets:
       - sdk: SwiftUI.framework
       - sdk: AppKit.framework
       - sdk: NetworkExtension.framework
+      - framework: NexusVPN/Api.xcframework
+        embed: true
+        codeSign: false
+      - target: NexusVPNExtension
+        embed: true
+        codeSign: false
+        copy:
+          destination: plugins
     info:
       path: NexusVPN/Info.plist
       properties:
@@ -43,9 +51,55 @@ targets:
         LSApplicationCategoryType: public.app-category.utilities
         NSHighResolutionCapable: true
         NSPrincipalClass: NSApplication
+    entitlements:
+      path: NexusVPN/NexusVPN.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.application-groups:
+          - group.com.nexusvpn
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
+
+  NexusVPNExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: NexusVPNExtension
+    dependencies:
+      - sdk: Foundation.framework
+      - sdk: NetworkExtension.framework
+      - framework: NexusVPN/Api.xcframework
+        codeSign: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nexusvpn.app.extension
+        INFOPLIST_KEY_CFBundleDisplayName: NexusVPNExtension
+    info:
+      path: NexusVPNExtension/Info.plist
+      properties:
+        CFBundleDisplayName: NexusVPNExtension
+        CFBundleName: NexusVPNExtension
+        CFBundlePackageType: XPC!
+        CFBundleShortVersionString: 1.0
+        CFBundleVersion: 1
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.networkextension.packet-tunnel
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PacketTunnelProvider
+    entitlements:
+      path: NexusVPNExtension/NexusVPNExtension.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.network.client: true
+        com.apple.security.application-groups:
+          - group.com.nexusvpn
+        com.apple.developer.networking.networkextension:
+          - packet-tunnel-provider
 
 schemes:
   NexusVPN:
     build:
       targets:
         NexusVPN: all
+        NexusVPNExtension: all
